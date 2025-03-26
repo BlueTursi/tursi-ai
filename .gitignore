@@ -1,0 +1,24 @@
+# Virtual environment
+venv/
+
+# Python bytecode and caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Editor/IDE files
+.idea/
+*.swp
+*~
+
+# System files
+.DS_Store
+
+# Logs and temporary files
+*.log
+*.tmp
+
+# Avoid tracking large model files (if downloaded locally)
+*.bin
+*.pth
