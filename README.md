@@ -1,5 +1,5 @@
 # tursi-ai
-An open-source framework to compose and deploy AI models with dolphin-like simplicity.
+An open-source framework to compose and deploy AI models with ease.
 
 ## Quick Start
 1. Install: `pip install tursi-ai` (placeholder for now).
