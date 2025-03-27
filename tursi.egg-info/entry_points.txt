@@ -1,0 +1,3 @@
+[console_scripts]
+tursi-engine = tursi.engine:main
+tursi-test = tursi.test:main

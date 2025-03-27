@@ -3,7 +3,6 @@ from transformers import pipeline
 from flask import Flask, request, jsonify
 
 def main():
-    # Set up argument parser
     parser = argparse.ArgumentParser(description="tursi-engine: Deploy an AI model with Flask")
     parser.add_argument("command", choices=["up"], help="Command to run ('up' to start the server)")
     parser.add_argument("--model", default="distilbert-base-uncased-finetuned-sst-2-english",
@@ -13,7 +12,6 @@ def main():
     args = parser.parse_args()
 
     if args.command == "up":
-        # Load the model
         print(f"Loading model: {args.model}...")
         try:
             model = pipeline("text-classification", model=args.model)
@@ -22,7 +20,6 @@ def main():
             print(f"Failed to load model: {str(e)}")
             return
 
-        # Set up Flask app
         app = Flask(__name__)
 
         @app.route("/predict", methods=["POST"])
@@ -39,7 +36,6 @@ def main():
             except Exception as e:
                 return jsonify({"error": str(e)}), 500
 
-        # Start the server
         print(f"Deploying at http://{args.host}:{args.port}/predict")
         app.run(host=args.host, port=args.port, debug=True)
 

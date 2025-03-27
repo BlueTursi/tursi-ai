@@ -1,0 +1,13 @@
+LICENSE
+MANIFEST.in
+README.md
+setup.py
+tursi/__init__.py
+tursi/engine.py
+tursi/test.py
+tursi.egg-info/PKG-INFO
+tursi.egg-info/SOURCES.txt
+tursi.egg-info/dependency_links.txt
+tursi.egg-info/entry_points.txt
+tursi.egg-info/requires.txt
+tursi.egg-info/top_level.txt
