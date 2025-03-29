@@ -1,5 +1,7 @@
 # tursi-ai
 
+[![GitHub release](https://img.shields.io/github/v/release/BlueTursi/tursi-ai)](https://github.com/BlueTursi/tursi-ai/releases)
+
 A simple, lightweight framework to deploy AI models locally with a single command—no Docker, no external services required.
 
 ## Overview
