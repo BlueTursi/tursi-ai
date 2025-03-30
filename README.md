@@ -28,11 +28,20 @@ Install via PyPI:
 pip install tursi
 ```
 
-Or from source (for development):
+Or from source (for development)
 
+1. Clone the repo:
 ```bash
 git clone https://github.com/BlueTursi/tursi-ai.git
 cd tursi-ai
+```
+2. Set up a virtual environment (required):
+```bash
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+```
+3. Install:
+```bash
 pip install .
 ```
 
@@ -43,7 +52,12 @@ pip install .
 tursi-engine up
 ```
 
-Or with a custom model:
+Stop it with:
+```bash
+tursi-engine down
+```
+
+Customize:
 ```bash
 tursi-engine up --model "distilbert-base-uncased-finetuned-sst-2-english" --host "127.0.0.1" --port 8080
 ```
@@ -59,6 +73,7 @@ Or with a custom URL:
 ```bash
 tursi-test --prompt "I love AI" --url "http://127.0.0.1:8080/predict"
 ```
+---
 
 ## Project Structure
 
