@@ -10,7 +10,7 @@ permissions:
   packages: write
 
 jobs:
-  build:
+  build-and-release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -29,17 +29,17 @@ jobs:
           pip install -r requirements.txt
           pip install conventional-changelog-cli
           
-      - name: Build package
-        run: |
-          python -m build
-          
       - name: Generate Release Notes
         run: |
-          # Get the latest version from setup.py
-          VERSION=$(python setup.py --version)
+          # Get the version from the tag
+          VERSION=${GITHUB_REF#refs/tags/v}
           
           # Generate changelog for the release
           conventional-changelog -p angular -i CHANGELOG.md -s -r 0
+          
+      - name: Build package
+        run: |
+          python -m build
           
       - name: Create Release
         id: create_release

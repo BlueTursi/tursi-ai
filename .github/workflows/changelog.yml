@@ -36,9 +36,6 @@ jobs:
           
       - name: Generate Changelog
         run: |
-          # Get the latest version from setup.py
-          VERSION=$(python setup.py --version)
-          
           # Generate changelog
           conventional-changelog -p angular -i CHANGELOG.md -s -r 0
           
@@ -48,6 +45,6 @@ jobs:
           else
             # Commit changes
             git add CHANGELOG.md
-            git commit -m "docs: update changelog for version $VERSION"
+            git commit -m "docs: update changelog"
             git push
           fi 
