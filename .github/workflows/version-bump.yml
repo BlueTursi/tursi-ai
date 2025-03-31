@@ -55,7 +55,7 @@ jobs:
           elif grep -q "feat:" CHANGELOG.md; then
             # Minor version bump
             NEW_VERSION=$(echo ${{ steps.get_version.outputs.current_version }} | awk -F. '{print $1"."$2+1".0"}')
-          elif grep -q "fix:" CHANGELOG.md; then
+          elif grep -q "fix:" CHANGELOG.md || grep -q "docs:" CHANGELOG.md; then
             # Patch version bump
             NEW_VERSION=$(echo ${{ steps.get_version.outputs.current_version }} | awk -F. '{print $1"."$2"."$3+1"}')
           else

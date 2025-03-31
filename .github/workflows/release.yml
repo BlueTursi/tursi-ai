@@ -51,6 +51,8 @@ jobs:
           draft: false
           prerelease: false
           body_path: CHANGELOG.md
+          tag_name: ${{ github.ref_name }}
+          release_name: Release ${{ github.ref_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           
