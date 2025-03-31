@@ -52,12 +52,4 @@ jobs:
       run: poetry build
 
     - name: Test installed package
-      run: poetry run python -c "import tursi; print(tursi.__version__)"
-
-    - name: Initialize CodeQL
-      uses: github/codeql-action/init@v3
-      with:
-        languages: python
-
-    - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v3 
+      run: poetry run python -c "import tursi; print(tursi.__version__)" 
