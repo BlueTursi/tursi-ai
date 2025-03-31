@@ -26,18 +26,18 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install build wheel setuptools
+          pip install build wheel setuptools pytest pytest-cov flake8
           pip install -e .
           pip install -r requirements-dev.txt
           pip install -r requirements.txt
           
       - name: Run tests
         run: |
-          python -m pytest tests/ -v
+          python -m pytest tests/ -v --cov=tursi
           
       - name: Run linting
         run: |
-          flake8 tursi --max-line-length=120
+          flake8 tursi --max-line-length=120 --extend-ignore=E203,W503
           
       - name: Build package
         run: |
