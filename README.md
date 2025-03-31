@@ -15,6 +15,7 @@ A simple framework to deploy AI models locally with one command, no containers n
 - Automated GitHub releases
 - Improved release workflow
 - Automated semantic versioning
+- Enhanced CI/CD pipeline
 
 ## Installation
 
