@@ -48,7 +48,7 @@ def create_app(model_name: str, rate_limit: str = RATE_LIMIT):
         # Sanitize model name
         model_name = sanitize_model_name(model_name)
         logger.info(f"Loading model: {model_name}...")
-        
+
         # Load model with security settings
         model = pipeline(
             "text-classification",
@@ -80,22 +80,24 @@ def create_app(model_name: str, rate_limit: str = RATE_LIMIT):
         try:
             if not request.is_json:
                 return jsonify({"error": "Request must be JSON"}), 400
-            
+
             data = request.get_json()
             if not data or "text" not in data:
-                return jsonify({"error": "Missing 'text' field in request"}), 400
-                
+                return jsonify({
+                    "error": "Missing 'text' field in request"
+                }), 400
+
             text = data.get("text", "")
-            
+
             # Validate input
             if not validate_input(text):
                 return jsonify({
                     "error": (
-                        "Invalid input. Text must be a string of maximum length "
-                        "512 characters."
+                        "Invalid input. Text must be a string of maximum "
+                        "length 512 characters."
                     )
                 }), 400
-            
+
             # Run inference
             result = model(text)
             return jsonify(result[0])
