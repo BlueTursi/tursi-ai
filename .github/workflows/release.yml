@@ -26,6 +26,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
+          pip install build wheel setuptools
           pip install -r requirements-dev.txt
           pip install -r requirements.txt
           pip install conventional-changelog-cli
@@ -34,17 +35,30 @@ jobs:
         run: |
           # Get the version from the tag
           VERSION=${GITHUB_REF#refs/tags/v}
+          echo "Building release for version $VERSION"
           
+          # Ensure CHANGELOG.md exists
+          touch CHANGELOG.md
           # Generate changelog for the release
           conventional-changelog -p angular -i CHANGELOG.md -s -r 0
           
       - name: Build package
         run: |
+          # Show Python version and environment info
+          python --version
+          pip list
+          
+          # Build the package
           python -m build
+          
+          # List the built files
+          ls -l dist/
           
       - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           files: |
             dist/*.whl
@@ -55,8 +69,6 @@ jobs:
           tag_name: ${{ github.ref_name }}
           release_name: Release ${{ github.ref_name }}
           generate_release_notes: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           
       - name: Upload to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1

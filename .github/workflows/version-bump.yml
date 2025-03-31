@@ -13,6 +13,7 @@ permissions:
 jobs:
   version-bump:
     runs-on: ubuntu-latest
+    if: ${{ !contains(github.event.head_commit.message, 'chore(release)') }}  # Skip if this is a release commit
     steps:
       - uses: actions/checkout@v4
         with:
@@ -27,7 +28,9 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
+          pip install build wheel setuptools
           pip install -r requirements-dev.txt
+          pip install -r requirements.txt
           pip install conventional-changelog-cli
           
       - name: Configure Git
@@ -39,10 +42,13 @@ jobs:
         id: get_version
         run: |
           CURRENT_VERSION=$(python setup.py --version)
+          echo "Current version: $CURRENT_VERSION"
           echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
           
       - name: Generate changelog
         run: |
+          # Ensure CHANGELOG.md exists
+          touch CHANGELOG.md
           # Generate changelog
           conventional-changelog -p angular -i CHANGELOG.md -s -r 0
           
@@ -62,6 +68,7 @@ jobs:
           else
             NEW_VERSION=${{ steps.get_version.outputs.current_version }}
           fi
+          echo "New version: $NEW_VERSION"
           echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
           
       - name: Update version
@@ -69,6 +76,9 @@ jobs:
         run: |
           # Update version in setup.py
           sed -i "s/version=\".*\"/version=\"${{ steps.check_bump.outputs.new_version }}\"/" setup.py
+          
+          # Show the changes
+          git diff
           
           # Commit changes
           git add setup.py CHANGELOG.md
