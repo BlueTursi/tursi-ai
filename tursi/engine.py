@@ -129,7 +129,10 @@ def main():
 
     if args.command == "up":
         app = create_app(args.model, args.rate_limit)
-        logger.info(f"Deploying at http://{args.host}:{args.port}/predict with rate limit: {args.rate_limit}")
+        logger.info(
+            f"Deploying at http://{args.host}:{args.port}/predict "
+            f"with rate limit: {args.rate_limit}"
+        )
         app.run(host=args.host, port=args.port, debug=False)
 
 if __name__ == "__main__":
