@@ -57,4 +57,7 @@ build/
 
 # Avoid tracking large model files (if downloaded locally)
 *.bin
-*.pth.env\n.pypirc\n.coverage
+*.pth
+
+# Local development tools
+bin/
