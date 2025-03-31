@@ -59,17 +59,22 @@ jobs:
           if echo "$COMMITS" | grep -q "BREAKING CHANGE"; then
             # Major version bump
             NEW_VERSION=$(echo ${{ steps.get_version.outputs.current_version }} | awk -F. '{print $1+1".0.0"}')
+            SIGNIFICANT=true
           elif echo "$COMMITS" | grep -q "^feat"; then
             # Minor version bump
             NEW_VERSION=$(echo ${{ steps.get_version.outputs.current_version }} | awk -F. '{print $1"."$2+1".0"}')
+            SIGNIFICANT=true
           elif echo "$COMMITS" | grep -qE "^(fix|docs|ci|test)"; then
             # Patch version bump
             NEW_VERSION=$(echo ${{ steps.get_version.outputs.current_version }} | awk -F. '{print $1"."$2"."$3+1"}')
+            SIGNIFICANT=false
           else
             NEW_VERSION=${{ steps.get_version.outputs.current_version }}
+            SIGNIFICANT=false
           fi
           echo "New version: $NEW_VERSION"
           echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "significant=$SIGNIFICANT" >> $GITHUB_OUTPUT
           
       - name: Update version and changelog
         if: steps.check_bump.outputs.new_version != steps.get_version.outputs.current_version
@@ -94,6 +99,11 @@ jobs:
           git commit -m "chore(release): bump version to ${{ steps.check_bump.outputs.new_version }}"
           git push origin HEAD:main
           
-          # Create and push tag
-          git tag -a "v${{ steps.check_bump.outputs.new_version }}" -m "Release v${{ steps.check_bump.outputs.new_version }}"
-          git push origin "v${{ steps.check_bump.outputs.new_version }}" 
+          # Create and push tag with prefix based on significance
+          if [ "${{ steps.check_bump.outputs.significant }}" = "true" ]; then
+            git tag -a "release/v${{ steps.check_bump.outputs.new_version }}" -m "Release v${{ steps.check_bump.outputs.new_version }}"
+            git push origin "release/v${{ steps.check_bump.outputs.new_version }}"
+          else
+            git tag -a "patch/v${{ steps.check_bump.outputs.new_version }}" -m "Patch v${{ steps.check_bump.outputs.new_version }}"
+            git push origin "patch/v${{ steps.check_bump.outputs.new_version }}"
+          fi 
