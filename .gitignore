@@ -21,4 +21,4 @@ __pycache__/
 
 # Avoid tracking large model files (if downloaded locally)
 *.bin
-*.pth
+*.pth.env\n.pypirc\n.coverage

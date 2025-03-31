@@ -61,6 +61,9 @@ def create_app(model_name: str, rate_limit: str = RATE_LIMIT):
 
     app = Flask(__name__)
     
+    # Store rate limit in app config
+    app.config['RATE_LIMIT'] = rate_limit
+    
     # Initialize rate limiter
     limiter = Limiter(
         app=app,
@@ -78,6 +81,9 @@ def create_app(model_name: str, rate_limit: str = RATE_LIMIT):
                 return jsonify({"error": "Request must be JSON"}), 400
             
             data = request.get_json()
+            if not data or "text" not in data:
+                return jsonify({"error": "Missing 'text' field in request"}), 400
+                
             text = data.get("text", "")
             
             # Validate input

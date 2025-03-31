@@ -11,8 +11,10 @@ from tursi.engine import create_app, ALLOWED_MODELS
 def mock_pipeline():
     """Mock the transformers pipeline."""
     with patch('tursi.engine.pipeline') as mock:
-        mock.return_value = MagicMock()
-        mock.return_value.return_value = [{'label': 'POSITIVE', 'score': 0.9}]
+        # Create a mock model that returns a fixed result
+        mock_model = MagicMock()
+        mock_model.return_value = [{'label': 'POSITIVE', 'score': 0.9}]
+        mock.return_value = mock_model
         yield mock
 
 
@@ -49,7 +51,7 @@ def test_predict_endpoint(mock_pipeline):
     # Test with invalid data
     response = client.post('/predict', json={})
     assert response.status_code == 400
-    assert b'Invalid input' in response.data
+    assert b'Missing \'text\' field' in response.data
     
     # Test with valid data
     response = client.post('/predict', json={'text': 'Hello, world!'})
