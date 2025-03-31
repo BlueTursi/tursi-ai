@@ -1,0 +1,18 @@
+# <type>: <subject>
+#
+# <body>
+#
+# <footer>
+#
+# Type can be:
+#   feat     (new feature)
+#   fix      (bug fix)
+#   docs     (documentation changes)
+#   style    (formatting, missing semi colons, etc; no code change)
+#   refactor (refactoring production code)
+#   test     (adding missing tests)
+#   chore    (updating grunt tasks etc; no production code change)
+#   perf     (performance improvements)
+#   ci       (continuous integration related)
+#   build    (build system or external dependencies)
+#   revert   (reverting a commit) 
