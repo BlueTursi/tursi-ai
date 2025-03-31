@@ -26,21 +26,16 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install build wheel setuptools
+          pip install build wheel setuptools twine
           pip install -r requirements-dev.txt
           pip install -r requirements.txt
-          pip install conventional-changelog-cli
           
-      - name: Generate Release Notes
+      - name: Extract version from tag
+        id: get_version
         run: |
-          # Get the version from the tag
           VERSION=${GITHUB_REF#refs/tags/v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Building release for version $VERSION"
-          
-          # Ensure CHANGELOG.md exists
-          touch CHANGELOG.md
-          # Generate changelog for the release
-          conventional-changelog -p angular -i CHANGELOG.md -s -r 0
           
       - name: Build package
         run: |
@@ -51,8 +46,9 @@ jobs:
           # Build the package
           python -m build
           
-          # List the built files
+          # Verify the built files
           ls -l dist/
+          twine check dist/*
           
       - name: Create Release
         id: create_release
@@ -65,7 +61,6 @@ jobs:
             dist/*.tar.gz
           draft: false
           prerelease: false
-          body_path: CHANGELOG.md
           tag_name: ${{ github.ref_name }}
           release_name: Release ${{ github.ref_name }}
           generate_release_notes: true
