@@ -1,5 +1,20 @@
 # Changelog
 
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## Versioning Strategy
+
+This project follows semantic versioning with the following rules:
+- Breaking changes trigger a major version bump (X.0.0)
+- New features trigger a minor version bump (0.X.0)
+- Bug fixes and documentation updates trigger a patch version bump (0.0.X)
+
+Only breaking changes and new features will trigger a GitHub release and PyPI publication.
+Patch updates will only update the version number and changelog.
+
 ## [0.2.1] - 2024-03-31
 
 ### Security
