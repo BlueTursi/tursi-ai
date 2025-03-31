@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="tursi",
-    version="0.2.3",
+    version="0.2.4",
     description="A simple framework to deploy AI models locally with one command, no containers needed",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
