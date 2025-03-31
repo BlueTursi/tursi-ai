@@ -11,6 +11,7 @@ A simple framework to deploy AI models locally with one command, no containers n
 - Simple API interface
 - Rate limiting and security features
 - Automated versioning and releases
+- CI/CD pipeline with automated testing
 
 ## Installation
 
