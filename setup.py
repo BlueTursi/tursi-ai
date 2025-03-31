@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="tursi",
-    version="0.2.0",
+    version="0.2.2",
     description="A simple framework to deploy AI models locally with one command, no containers needed",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
@@ -13,9 +13,12 @@ setup(
     install_requires=[
         "transformers",
         "flask",
-        "torch==2.2.1",
+        "torch>=2.3.2",
         "requests",
         "numpy<2",
+        "python-dotenv",
+        "cryptography",
+        "Flask-Limiter>=3.5.0",
     ],
     entry_points={
         "console_scripts": [
