@@ -6,6 +6,12 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+  security-events: write
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -42,4 +48,14 @@ jobs:
       - name: Test installed package
         run: |
           tursi-engine --help
-          tursi-test --help 
+          tursi-test --help
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: python
+          
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:python" 
