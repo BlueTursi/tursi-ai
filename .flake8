@@ -1,2 +1,6 @@
 [flake8]
-ignore = W292
+max-line-length = 100
+ignore = W293,E302,E305
+exclude = .git,__pycache__,build,dist
+per-file-ignores =
+    __init__.py: F401
