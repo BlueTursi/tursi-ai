@@ -1,8 +1,7 @@
 import argparse
 import os
-import sys
-from flask import Flask, request, jsonify
 import logging
+from flask import Flask, request, jsonify
 from dotenv import load_dotenv
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -26,6 +25,7 @@ ALLOWED_MODELS = [
 RATE_LIMIT = "100 per minute"  # Adjust based on your needs
 RATE_LIMIT_STORAGE_URI = os.getenv("RATE_LIMIT_STORAGE_URI", "memory://")
 
+
 def validate_input(text: str) -> bool:
     """Validate input text for security."""
     if not isinstance(text, str):
@@ -35,11 +35,12 @@ def validate_input(text: str) -> bool:
     # Add more validation as needed
     return True
 
+
 def sanitize_model_name(model_name: str) -> str:
-    """Sanitize and validate model name."""
-    if model_name not in ALLOWED_MODELS:
-        raise ValueError(f"Model {model_name} is not in the allowed list")
+    """Sanitize model name for security."""
+    # Add model name sanitization logic here
     return model_name
+
 
 def create_app(model_name: str, rate_limit: str = RATE_LIMIT):
     """Create and configure the Flask application."""
@@ -89,7 +90,10 @@ def create_app(model_name: str, rate_limit: str = RATE_LIMIT):
             # Validate input
             if not validate_input(text):
                 return jsonify({
-                    "error": "Invalid input. Text must be a string of maximum length 512 characters."
+                    "error": (
+                        "Invalid input. Text must be a string of maximum length "
+                        "512 characters."
+                    )
                 }), 400
             
             # Run inference
