@@ -45,6 +45,10 @@ def sanitize_model_name(model_name: str) -> str:
 def create_app(model_name: str, rate_limit: str = RATE_LIMIT):
     """Create and configure the Flask application."""
     try:
+        # Validate model name
+        if model_name not in ALLOWED_MODELS:
+            raise ValueError(f"Model {model_name} is not in the allowed list")
+
         # Sanitize model name
         model_name = sanitize_model_name(model_name)
         logger.info(f"Loading model: {model_name}...")
@@ -56,6 +60,9 @@ def create_app(model_name: str, rate_limit: str = RATE_LIMIT):
             device=-1  # Use CPU only for better security
         )
         logger.info("Model loaded successfully!")
+    except ValueError as e:
+        logger.error(f"Invalid model: {str(e)}")
+        raise
     except Exception as e:
         logger.error(f"Failed to load model: {str(e)}")
         raise
