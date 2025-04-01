@@ -5,6 +5,8 @@
 
 ### Chore
 
+* chore(release): bump version to 0.2.9 ([`d74176c`](https://github.com/BlueTursi/tursi-ai/commit/d74176c6bb9c3b0c3c80fd60ab55381c4b0a70a1))
+
 * chore(release): rollback version to 0.2.8 ([`0d8327d`](https://github.com/BlueTursi/tursi-ai/commit/0d8327d6796245b6355464544640757d55fed05b))
 
 * chore(release): bump version to 0.3.0 ([`9046a97`](https://github.com/BlueTursi/tursi-ai/commit/9046a97c51652c1aa4f3a9f23f25cabb41ffd323))
@@ -110,6 +112,10 @@
 * test: add initial test suite ([`4474a15`](https://github.com/BlueTursi/tursi-ai/commit/4474a158e86ac699c35a710699a4b3b63ed85927))
 
 ### Unknown
+
+* Merge main and resolve conflicts ([`b7d3975`](https://github.com/BlueTursi/tursi-ai/commit/b7d397535646018b55ee4344ef2c5f3cd4863a30))
+
+* new-feat: Add quantization support and update documentation ([`80e529f`](https://github.com/BlueTursi/tursi-ai/commit/80e529f6afed89b9dae0454af1c85a7ff9fb6bac))
 
 * Feat: update gitignore for local bin ([`dca4ea3`](https://github.com/BlueTursi/tursi-ai/commit/dca4ea32dce787f326fa3dec0fc1c7380565ffc5))
 
