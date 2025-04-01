@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "tursi"
-version = "0.3.0"
+version = "0.2.8"
 description = "A simple framework to deploy AI models locally with one command, no containers needed"
 authors = ["BlueTursi <hello@bluetursi.com>"]
 readme = "README.md"
