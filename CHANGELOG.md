@@ -5,6 +5,10 @@
 
 ### Chore
 
+* chore(release): rollback version to 0.2.8 ([`0d8327d`](https://github.com/BlueTursi/tursi-ai/commit/0d8327d6796245b6355464544640757d55fed05b))
+
+* chore(release): bump version to 0.3.0 ([`9046a97`](https://github.com/BlueTursi/tursi-ai/commit/9046a97c51652c1aa4f3a9f23f25cabb41ffd323))
+
 * chore(release): bump version to 0.2.7 ([`4837e59`](https://github.com/BlueTursi/tursi-ai/commit/4837e59e43d0a120a979307213cac80075a0ae31))
 
 * chore(release): bump version to 0.2.6 ([`3df1d31`](https://github.com/BlueTursi/tursi-ai/commit/3df1d31308b33eb92aecd6c2cdd70d12305fad9e))
@@ -28,6 +32,10 @@
 * chore: remove legacy package files in favor of Poetry ([`55c645e`](https://github.com/BlueTursi/tursi-ai/commit/55c645e747805e130bbb13532d85fa90e388fb25))
 
 ### Ci
+
+* ci: update version bump workflow to only create release tags for major versions, new features, and security patches ([`dbb73e9`](https://github.com/BlueTursi/tursi-ai/commit/dbb73e9b29d3c42f210df29be2db8f22b9a92bf6))
+
+* ci: update version bump workflow to handle release and patch tags ([`28bc25d`](https://github.com/BlueTursi/tursi-ai/commit/28bc25d112b2182b52221066e62251f1336c588f))
 
 * ci: update CodeQL configuration to use default setup ([`96374ba`](https://github.com/BlueTursi/tursi-ai/commit/96374baa0a0c62889706de1b1b2bd281f479b926))
 
