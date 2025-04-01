@@ -72,10 +72,32 @@ jobs:
         continue-on-error: true
         run: |
           if [ -n "$SNYK_TOKEN" ]; then
-            poetry run snyk code test --sarif > snyk-code.sarif || echo '{"version": "2.1.0", "runs": []}' > snyk-code.sarif
+            poetry run snyk code test --sarif > snyk-code.sarif || echo '{
+              "version": "2.1.0",
+              "runs": [{
+                "tool": {
+                  "driver": {
+                    "name": "Snyk Code",
+                    "version": "1.0.0"
+                  }
+                },
+                "results": []
+              }]
+            }' > snyk-code.sarif
           else
             echo "Skipping Snyk Code test: SNYK_TOKEN not set"
-            echo '{"version": "2.1.0", "runs": []}' > snyk-code.sarif
+            echo '{
+              "version": "2.1.0",
+              "runs": [{
+                "tool": {
+                  "driver": {
+                    "name": "Snyk Code",
+                    "version": "1.0.0"
+                  }
+                },
+                "results": []
+              }]
+            }' > snyk-code.sarif
           fi
 
       - name: Snyk Open Source monitor
