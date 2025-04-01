@@ -13,7 +13,10 @@ permissions:
 jobs:
   version-bump:
     runs-on: ubuntu-latest
-    if: contains(github.event.head_commit.message, 'chore(release)') == false
+    # Skip if the commit is from the bot or is a release commit
+    if: |
+      contains(github.event.head_commit.message, 'chore(release)') == false &&
+      github.actor != 'github-actions[bot]'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -48,8 +51,8 @@ jobs:
           
       - name: Configure Git
         run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git config --global user.name 'Tursi CI'
+          git config --global user.email 'ci@tursi.ai'
           
       - name: Get current version
         id: get_version
@@ -85,10 +88,19 @@ jobs:
             SIGNIFICANT=true
             TAG_PREFIX="release/v"
           elif echo "$COMMITS" | grep -qE "^(fix|docs|ci|test)"; then
-            # Regular patch version bump
-            NEW_VERSION=$(echo ${{ steps.get_version.outputs.current_version }} | awk -F. '{print $1"."$2"."($3+1)}')
-            SIGNIFICANT=false
-            TAG_PREFIX="patch/v"
+            # Regular patch version bump - allow up to 999
+            CURRENT_PATCH=$(echo ${{ steps.get_version.outputs.current_version }} | awk -F. '{print $3}')
+            if [ "$CURRENT_PATCH" -ge 999 ]; then
+              # If patch version is 999 or higher, increment minor version
+              NEW_VERSION=$(echo ${{ steps.get_version.outputs.current_version }} | awk -F. '{print $1"."($2+1)".0"}')
+              SIGNIFICANT=false
+              TAG_PREFIX="patch/v"
+            else
+              # Normal patch version increment
+              NEW_VERSION=$(echo ${{ steps.get_version.outputs.current_version }} | awk -F. '{print $1"."$2"."($3+1)}')
+              SIGNIFICANT=false
+              TAG_PREFIX="patch/v"
+            fi
           else
             NEW_VERSION=${{ steps.get_version.outputs.current_version }}
             SIGNIFICANT=false
