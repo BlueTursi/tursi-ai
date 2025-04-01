@@ -5,6 +5,8 @@
 
 ### Chore
 
+* chore(release): bump version to 0.2.5 ([`679eb41`](https://github.com/BlueTursi/tursi-ai/commit/679eb41ab58a61f85912059bac66455d323b647b))
+
 * chore: update workflows to use Poetry and fix YAML syntax ([`59034b0`](https://github.com/BlueTursi/tursi-ai/commit/59034b06c63c55bebd3095014845e8b26c62bd0c))
 
 * chore: update changelog workflow to use Poetry ([`f79a7b2`](https://github.com/BlueTursi/tursi-ai/commit/f79a7b20f261e2bd32768c527e3d02551cbffe36))
@@ -64,6 +66,8 @@
 * docs: update README with simplified instructions and features ([`4a5032e`](https://github.com/BlueTursi/tursi-ai/commit/4a5032ed0bd7eca5cd189704980c5029a6cb1f4e))
 
 ### Fix
+
+* fix: create valid empty SARIF file for Snyk ([`61a609e`](https://github.com/BlueTursi/tursi-ai/commit/61a609ed72e1f4b3645820dbc0e9e14a56ca6fc7))
 
 * fix: update semantic-release changelog command ([`94e6cd1`](https://github.com/BlueTursi/tursi-ai/commit/94e6cd18e4b248812f30bbf1d57b747a09d42f7f))
 
