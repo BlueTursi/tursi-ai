@@ -5,6 +5,8 @@
 
 ### Chore
 
+* chore(release): bump version to 0.2.7 ([`4837e59`](https://github.com/BlueTursi/tursi-ai/commit/4837e59e43d0a120a979307213cac80075a0ae31))
+
 * chore(release): bump version to 0.2.6 ([`3df1d31`](https://github.com/BlueTursi/tursi-ai/commit/3df1d31308b33eb92aecd6c2cdd70d12305fad9e))
 
 * chore(release): bump version to 0.2.5 ([`679eb41`](https://github.com/BlueTursi/tursi-ai/commit/679eb41ab58a61f85912059bac66455d323b647b))
@@ -66,6 +68,10 @@
 ### Documentation
 
 * docs: update README with simplified instructions and features ([`4a5032e`](https://github.com/BlueTursi/tursi-ai/commit/4a5032ed0bd7eca5cd189704980c5029a6cb1f4e))
+
+### Feature
+
+* feat: add special handling for security patches in version bumping ([`c824a79`](https://github.com/BlueTursi/tursi-ai/commit/c824a79fe5afa09b53aae4c950c5e5adae7a4d67))
 
 ### Fix
 
