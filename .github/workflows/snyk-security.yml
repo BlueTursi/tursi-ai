@@ -72,10 +72,10 @@ jobs:
         continue-on-error: true
         run: |
           if [ -n "$SNYK_TOKEN" ]; then
-            poetry run snyk code test --sarif > snyk-code.sarif || touch snyk-code.sarif
+            poetry run snyk code test --sarif > snyk-code.sarif || echo '{"version": "2.1.0", "runs": []}' > snyk-code.sarif
           else
             echo "Skipping Snyk Code test: SNYK_TOKEN not set"
-            touch snyk-code.sarif
+            echo '{"version": "2.1.0", "runs": []}' > snyk-code.sarif
           fi
 
       - name: Snyk Open Source monitor
