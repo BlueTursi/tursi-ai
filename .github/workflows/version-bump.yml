@@ -74,7 +74,7 @@ jobs:
             NEW_VERSION=$(echo ${{ steps.get_version.outputs.current_version }} | awk -F. '{print $1+1".0.0"}')
             SIGNIFICANT=true
             TAG_PREFIX="release/v"
-          elif echo "$COMMITS" | grep -q "^feat"; then
+          elif echo "$COMMITS" | grep -q "^new-feat"; then
             # Minor version bump
             NEW_VERSION=$(echo ${{ steps.get_version.outputs.current_version }} | awk -F. '{print $1"."($2+1)".0"}')
             SIGNIFICANT=true
