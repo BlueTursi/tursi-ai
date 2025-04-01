@@ -73,21 +73,31 @@ jobs:
             # Major version bump
             NEW_VERSION=$(echo ${{ steps.get_version.outputs.current_version }} | awk -F. '{print $1+1".0.0"}')
             SIGNIFICANT=true
+            TAG_PREFIX="release/v"
           elif echo "$COMMITS" | grep -q "^feat"; then
             # Minor version bump
             NEW_VERSION=$(echo ${{ steps.get_version.outputs.current_version }} | awk -F. '{print $1"."($2+1)".0"}')
             SIGNIFICANT=true
+            TAG_PREFIX="release/v"
+          elif echo "$COMMITS" | grep -q "security\|fix.*security\|patch.*security"; then
+            # Security patch - increment patch version regardless of semver
+            NEW_VERSION=$(echo ${{ steps.get_version.outputs.current_version }} | awk -F. '{print $1"."$2"."($3+1)}')
+            SIGNIFICANT=true
+            TAG_PREFIX="release/v"
           elif echo "$COMMITS" | grep -qE "^(fix|docs|ci|test)"; then
-            # Patch version bump
+            # Regular patch version bump
             NEW_VERSION=$(echo ${{ steps.get_version.outputs.current_version }} | awk -F. '{print $1"."$2"."($3+1)}')
             SIGNIFICANT=false
+            TAG_PREFIX="patch/v"
           else
             NEW_VERSION=${{ steps.get_version.outputs.current_version }}
             SIGNIFICANT=false
+            TAG_PREFIX="patch/v"
           fi
           echo "New version: $NEW_VERSION"
           echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
           echo "significant=$SIGNIFICANT" >> $GITHUB_OUTPUT
+          echo "tag_prefix=$TAG_PREFIX" >> $GITHUB_OUTPUT
           
       - name: Update version and changelog
         if: steps.check_bump.outputs.new_version != steps.get_version.outputs.current_version
@@ -114,11 +124,6 @@ jobs:
           git commit -m "chore(release): bump version to ${{ steps.check_bump.outputs.new_version }}"
           git push origin HEAD:main
           
-          # Create and push tag with prefix based on significance
-          if [ "${{ steps.check_bump.outputs.significant }}" = "true" ]; then
-            git tag -a "release/v${{ steps.check_bump.outputs.new_version }}" -m "Release v${{ steps.check_bump.outputs.new_version }}"
-            git push origin "release/v${{ steps.check_bump.outputs.new_version }}"
-          else
-            git tag -a "patch/v${{ steps.check_bump.outputs.new_version }}" -m "Patch v${{ steps.check_bump.outputs.new_version }}"
-            git push origin "patch/v${{ steps.check_bump.outputs.new_version }}"
-          fi 
+          # Create and push tag
+          git tag -a "${{ steps.check_bump.outputs.tag_prefix }}${{ steps.check_bump.outputs.new_version }}" -m "${{ steps.check_bump.outputs.tag_prefix }}${{ steps.check_bump.outputs.new_version }}"
+          git push origin "${{ steps.check_bump.outputs.tag_prefix }}${{ steps.check_bump.outputs.new_version }}" 
