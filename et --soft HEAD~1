@@ -1,0 +1,60 @@
+[33mcommit c824a79fe5afa09b53aae4c950c5e5adae7a4d67[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m
+Author: Kresna Sucandra <kresnasucandra@gmail.com>
+Date:   Tue Apr 1 20:05:23 2025 +0800
+
+    feat: add special handling for security patches in version bumping
+
+[1mdiff --git a/.github/workflows/version-bump.yml b/.github/workflows/version-bump.yml[m
+[1mindex ac684e7..dd655ab 100644[m
+[1m--- a/.github/workflows/version-bump.yml[m
+[1m+++ b/.github/workflows/version-bump.yml[m
+[36m@@ -73,21 +73,31 @@[m [mjobs:[m
+             # Major version bump[m
+             NEW_VERSION=$(echo ${{ steps.get_version.outputs.current_version }} | awk -F. '{print $1+1".0.0"}')[m
+             SIGNIFICANT=true[m
+[32m+[m[32m            TAG_PREFIX="release/v"[m
+           elif echo "$COMMITS" | grep -q "^feat"; then[m
+             # Minor version bump[m
+             NEW_VERSION=$(echo ${{ steps.get_version.outputs.current_version }} | awk -F. '{print $1"."($2+1)".0"}')[m
+             SIGNIFICANT=true[m
+[32m+[m[32m            TAG_PREFIX="release/v"[m
+[32m+[m[32m          elif echo "$COMMITS" | grep -q "security\|fix.*security\|patch.*security"; then[m
+[32m+[m[32m            # Security patch - increment patch version regardless of semver[m
+[32m+[m[32m            NEW_VERSION=$(echo ${{ steps.get_version.outputs.current_version }} | awk -F. '{print $1"."$2"."($3+1)}')[m
+[32m+[m[32m            SIGNIFICANT=true[m
+[32m+[m[32m            TAG_PREFIX="release/v"[m
+           elif echo "$COMMITS" | grep -qE "^(fix|docs|ci|test)"; then[m
+[31m-            # Patch version bump[m
+[32m+[m[32m            # Regular patch version bump[m
+             NEW_VERSION=$(echo ${{ steps.get_version.outputs.current_version }} | awk -F. '{print $1"."$2"."($3+1)}')[m
+             SIGNIFICANT=false[m
+[32m+[m[32m            TAG_PREFIX="patch/v"[m
+           else[m
+             NEW_VERSION=${{ steps.get_version.outputs.current_version }}[m
+             SIGNIFICANT=false[m
+[32m+[m[32m            TAG_PREFIX="patch/v"[m
+           fi[m
+           echo "New version: $NEW_VERSION"[m
+           echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT[m
+           echo "significant=$SIGNIFICANT" >> $GITHUB_OUTPUT[m
+[32m+[m[32m          echo "tag_prefix=$TAG_PREFIX" >> $GITHUB_OUTPUT[m
+           [m
+       - name: Update version and changelog[m
+         if: steps.check_bump.outputs.new_version != steps.get_version.outputs.current_version[m
+[36m@@ -114,11 +124,6 @@[m [mjobs:[m
+           git commit -m "chore(release): bump version to ${{ steps.check_bump.outputs.new_version }}"[m
+           git push origin HEAD:main[m
+           [m
+[31m-          # Create and push tag with prefix based on significance[m
+[31m-          if [ "${{ steps.check_bump.outputs.significant }}" = "true" ]; then[m
+[31m-            git tag -a "release/v${{ steps.check_bump.outputs.new_version }}" -m "Release v${{ steps.check_bump.outputs.new_version }}"[m
+[31m-            git push origin "release/v${{ steps.check_bump.outputs.new_version }}"[m
+[31m-          else[m
+[31m-            git tag -a "patch/v${{ steps.check_bump.outputs.new_version }}" -m "Patch v${{ steps.check_bump.outputs.new_version }}"[m
+[31m-            git push origin "patch/v${{ steps.check_bump.outputs.new_version }}"[m
+[31m-          fi [m
+\ No newline at end of file[m
+[32m+[m[32m          # Create and push tag[m
+[32m+[m[32m          git tag -a "${{ steps.check_bump.outputs.tag_prefix }}${{ steps.check_bump.outputs.new_version }}" -m "${{ steps.check_bump.outputs.tag_prefix }}${{ steps.check_bump.outputs.new_version }}"[m
+[32m+[m[32m          git push origin "${{ steps.check_bump.outputs.tag_prefix }}${{ steps.check_bump.outputs.new_version }}"[m[41m [m
+\ No newline at end of file[m

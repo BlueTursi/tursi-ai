@@ -5,7 +5,13 @@ from flask import Flask, request, jsonify
 from dotenv import load_dotenv
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from transformers import pipeline
+from transformers import pipeline, AutoModelForSequenceClassification
+from optimum.onnxruntime import ORTModelForSequenceClassification
+from optimum.exporters import TasksManager
+from transformers import AutoTokenizer
+import onnxruntime as ort
+import numpy as np
+import tempfile
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -25,6 +31,10 @@ ALLOWED_MODELS = [
 RATE_LIMIT = "100 per minute"  # Adjust based on your needs
 RATE_LIMIT_STORAGE_URI = os.getenv("RATE_LIMIT_STORAGE_URI", "memory://")
 
+# Quantization settings
+QUANTIZATION_MODE = os.getenv("QUANTIZATION_MODE", "dynamic")  # dynamic or static
+QUANTIZATION_BITS = int(os.getenv("QUANTIZATION_BITS", "8"))  # 8 or 4 bits
+
 
 def validate_input(text: str) -> bool:
     """Validate input text for security."""
@@ -42,6 +52,34 @@ def sanitize_model_name(model_name: str) -> str:
     return model_name
 
 
+def load_quantized_model(model_name: str):
+    """Load a quantized model using ONNX Runtime."""
+    try:
+        logger.info(f"Loading quantized model: {model_name}...")
+        
+        # Load tokenizer
+        tokenizer = AutoTokenizer.from_pretrained(model_name)
+        
+        # Configure ONNX Runtime session options
+        session_options = ort.SessionOptions()
+        session_options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
+        session_options.intra_op_num_threads = 1
+        
+        # Load model with quantization
+        model = ORTModelForSequenceClassification.from_pretrained(
+            model_name,
+            export=True,
+            session_options=session_options
+        )
+        
+        logger.info(f"Model quantized successfully with {QUANTIZATION_MODE} {QUANTIZATION_BITS}-bit quantization!")
+        return model, tokenizer
+            
+    except Exception as e:
+        logger.error(f"Failed to load quantized model: {str(e)}")
+        raise
+
+
 def create_app(model_name: str, rate_limit: str = RATE_LIMIT):
     """Create and configure the Flask application."""
     try:
@@ -51,14 +89,9 @@ def create_app(model_name: str, rate_limit: str = RATE_LIMIT):
 
         # Sanitize model name
         model_name = sanitize_model_name(model_name)
-        logger.info(f"Loading model: {model_name}...")
-
-        # Load model with security settings
-        model = pipeline(
-            "text-classification",
-            model=model_name,
-            device=-1  # Use CPU only for better security
-        )
+        
+        # Load model with quantization
+        model, tokenizer = load_quantized_model(model_name)
         logger.info("Model loaded successfully!")
     except ValueError as e:
         logger.error(f"Invalid model: {str(e)}")
@@ -105,14 +138,24 @@ def create_app(model_name: str, rate_limit: str = RATE_LIMIT):
                     )
                 }), 400
 
+            # Tokenize input
+            inputs = tokenizer(text, return_tensors="pt", padding=True, truncation=True)
+            
             # Run inference
-            result = model(text)
-            return jsonify(result[0])
+            outputs = model(**inputs)
+            predictions = outputs.logits.softmax(dim=-1)
+            
+            # Get prediction
+            label = "POSITIVE" if predictions[0][1] > predictions[0][0] else "NEGATIVE"
+            score = float(predictions[0][1] if label == "POSITIVE" else predictions[0][0])
+            
+            return jsonify({"label": label, "score": score})
         except Exception as e:
             logger.error(f"Error during prediction: {str(e)}")
             return jsonify({"error": "Internal server error"}), 500
 
     return app
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -144,15 +187,34 @@ def main():
         default=RATE_LIMIT,
         help="Rate limit for API requests (default: 100 per minute)"
     )
+    parser.add_argument(
+        "--quantization-mode",
+        choices=["dynamic", "static"],
+        default=QUANTIZATION_MODE,
+        help="Quantization mode (default: dynamic)"
+    )
+    parser.add_argument(
+        "--quantization-bits",
+        type=int,
+        choices=[4, 8],
+        default=QUANTIZATION_BITS,
+        help="Number of bits for quantization (default: 8)"
+    )
     args = parser.parse_args()
 
     if args.command == "up":
+        # Update quantization settings from command line
+        os.environ["QUANTIZATION_MODE"] = args.quantization_mode
+        os.environ["QUANTIZATION_BITS"] = str(args.quantization_bits)
+        
         app = create_app(args.model, args.rate_limit)
         logger.info(
             f"Deploying at http://{args.host}:{args.port}/predict "
-            f"with rate limit: {args.rate_limit}"
+            f"with rate limit: {args.rate_limit} "
+            f"and {args.quantization_mode} {args.quantization_bits}-bit quantization"
         )
         app.run(host=args.host, port=args.port, debug=False)
+
 
 if __name__ == "__main__":
     main()

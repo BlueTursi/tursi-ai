@@ -1,20 +1,24 @@
 [tool.poetry]
 name = "tursi"
-version = "0.2.8"
+version = "0.3.0"
 description = "A simple framework to deploy AI models locally with one command, no containers needed"
-authors = ["BlueTursi <hello@bluetursi.com>"]
+authors = ["Kresna Sucandra <kresnasucandra@gmail.com>"]
 readme = "README.md"
 packages = [{include = "tursi"}]
 license = "MIT"
 repository = "https://github.com/BlueTursi/tursi-ai"
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = ">=3.11,<3.13"
 flask = "^3.0.0"
 transformers = "^4.38.0"
 torch = "^2.2.1"
 python-dotenv = "^1.0.0"
 flask-limiter = "^3.5.0"
+optimum = "^1.17.0"
+accelerate = "^0.27.0"
+onnxruntime = "^1.17.0"
+onnx = "^1.15.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"

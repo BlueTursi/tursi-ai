@@ -4,7 +4,7 @@
 [![Tests](https://github.com/BlueTursi/tursi-ai/actions/workflows/test.yml/badge.svg)](https://github.com/BlueTursi/tursi-ai/actions/workflows/test.yml)
 [![Coverage](https://img.shields.io/badge/coverage-79%25-brightgreen.svg)](https://github.com/BlueTursi/tursi-ai)
 
-A simple framework to deploy AI models locally with one command, no containers needed.
+A simple framework to deploy AI models locally with one command, no containers needed. Features efficient model quantization for reduced memory usage and faster inference.
 
 ## Features
 
@@ -20,6 +20,10 @@ A simple framework to deploy AI models locally with one command, no containers n
 - Input validation and error handling
 - Configurable rate limiting
 - Secure model loading
+- Edge-efficient model quantization
+  - Dynamic and static quantization support
+  - 4-bit and 8-bit quantization options
+  - Optimized for CPU inference
 
 ## Installation
 
@@ -29,14 +33,34 @@ pip install tursi
 
 ## Usage
 
+### Basic Usage
+
 ```bash
-# Start the server
+# Start the server with default settings (dynamic 8-bit quantization)
 tursi-engine up
 
-# Test the server with curl
+# Start with custom quantization settings
+tursi-engine up --quantization-mode dynamic --quantization-bits 8
+```
+
+### Making Predictions
+
+```bash
+# Test with positive sentiment
 curl -X POST -H "Content-Type: application/json" \
-     -d '{"text": "Hello, world!"}' \
+     -d '{"text": "This is a great product! I love it!"}' \
      http://localhost:5000/predict
+
+# Example response:
+# {"label": "POSITIVE", "score": 0.9998828172683716}
+
+# Test with negative sentiment
+curl -X POST -H "Content-Type: application/json" \
+     -d '{"text": "This product is terrible, I regret buying it."}' \
+     http://localhost:5000/predict
+
+# Example response:
+# {"label": "NEGATIVE", "score": 0.9995611310005188}
 ```
 
 ## API Reference
@@ -60,7 +84,37 @@ Endpoint for making predictions using the loaded model.
 }
 ```
 
+## Configuration
+
+The following environment variables can be set:
+
+- `RATE_LIMIT`: API rate limit (default: "100 per minute")
+- `RATE_LIMIT_STORAGE_URI`: Storage backend for rate limiting (default: "memory://")
+- `QUANTIZATION_MODE`: Quantization mode (default: "dynamic")
+- `QUANTIZATION_BITS`: Number of bits for quantization (default: 8)
+
+### Quantization Options
+
+- **Mode**:
+  - `dynamic`: Quantization is performed at runtime (default)
+    - Best for general use cases
+    - Maintains good accuracy while reducing model size
+  - `static`: Quantization is performed during model loading
+    - Better performance for specific use cases
+    - Requires calibration data
+
+- **Bits**:
+  - `8`: 8-bit quantization (default)
+    - Good balance between compression and accuracy
+    - Recommended for most use cases
+  - `4`: 4-bit quantization
+    - More aggressive compression
+    - May impact accuracy
+    - Best for resource-constrained environments
+
 ## Development
+
+### Setting Up Development Environment
 
 ```bash
 # Clone the repository
@@ -80,12 +134,15 @@ poetry run pytest tests/ -v --cov=tursi
 poetry build
 ```
 
-## Configuration
+### Contributing
 
-The following environment variables can be set:
-
-- `RATE_LIMIT`: API rate limit (default: "100 per minute")
-- `RATE_LIMIT_STORAGE_URI`: Storage backend for rate limiting (default: "memory://")
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes
+4. Run tests to ensure everything works
+5. Commit your changes (`git commit -m 'Add amazing feature'`)
+6. Push to the branch (`git push origin feature/amazing-feature`)
+7. Open a Pull Request
 
 ## License
 
@@ -98,5 +155,7 @@ Built with 💙 using:
 - Flask
 - PyTorch
 - Poetry
+- ONNX Runtime
+- Optimum
 
 Built by [BlueTursi](https://bluetursi.com).
