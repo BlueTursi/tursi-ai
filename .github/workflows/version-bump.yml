@@ -91,12 +91,14 @@ jobs:
           
       - name: Update version and changelog
         if: steps.check_bump.outputs.new_version != steps.get_version.outputs.current_version
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Update version in pyproject.toml
           poetry version ${{ steps.check_bump.outputs.new_version }}
           
           # Generate changelog
-          poetry run semantic-release changelog --unreleased > new_changes.md
+          poetry run semantic-release changelog > new_changes.md
           if [ -f CHANGELOG.md ]; then
             cat new_changes.md CHANGELOG.md > temp_changelog.md
             mv temp_changelog.md CHANGELOG.md
