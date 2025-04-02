@@ -4,8 +4,9 @@ version = "0.3.1"
 description = "A simple framework to deploy AI models locally with one command, no containers needed"
 authors = ["Kresna Sucandra <kresnasucandra@gmail.com>"]
 readme = "README.md"
-packages = [{include = "tursi"}]
 license = "MIT"
+license-file = "LICENSE"
+packages = [{include = "tursi"}]
 repository = "https://github.com/BlueTursi/tursi-ai"
 
 [tool.poetry.dependencies]
