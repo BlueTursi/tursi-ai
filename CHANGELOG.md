@@ -5,6 +5,8 @@
 
 ### Chore
 
+* chore(release): bump version to 0.4.1 ([`bfa7da5`](https://github.com/BlueTursi/tursi-ai/commit/bfa7da5d0e828be7788c3d72289b2d6a4790ad50))
+
 * chore(release): bump version to 0.4.0 ([`e5aba20`](https://github.com/BlueTursi/tursi-ai/commit/e5aba20f9e85f063debfc4546205dae85355e5b0))
 
 * chore(release): bump version to 0.2.9 ([`d74176c`](https://github.com/BlueTursi/tursi-ai/commit/d74176c6bb9c3b0c3c80fd60ab55381c4b0a70a1))
@@ -94,6 +96,8 @@
 * feat: add special handling for security patches in version bumping ([`c824a79`](https://github.com/BlueTursi/tursi-ai/commit/c824a79fe5afa09b53aae4c950c5e5adae7a4d67))
 
 ### Fix
+
+* fix: Remove unused imports and fix line length in engine.py ([`31c2493`](https://github.com/BlueTursi/tursi-ai/commit/31c2493c51ad1123af32459e5dfcc271405d6752))
 
 * fix: Revert semantic-release configuration to simpler version ([`eb326cc`](https://github.com/BlueTursi/tursi-ai/commit/eb326cc1781847c868309ba0c0fde807fbd9f2a3))
 
