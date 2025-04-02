@@ -5,6 +5,12 @@
 
 ### Chore
 
+* chore: Revert version to 0.3.0 for feature release ([`694f6a9`](https://github.com/BlueTursi/tursi-ai/commit/694f6a9f1076f50b3717c36463878336a2fbc00a))
+
+* chore: Remove semantic-release to prevent version conflicts ([`bf7e38d`](https://github.com/BlueTursi/tursi-ai/commit/bf7e38d8d33b0d7447e5e63faf90cc9d9838f122))
+
+* chore(release): bump version to 0.3.1 ([`d1bbf66`](https://github.com/BlueTursi/tursi-ai/commit/d1bbf66115899e1fcd9cc56383442c70221c20cb))
+
 * chore(release): bump version to 0.4.2 ([`a9de208`](https://github.com/BlueTursi/tursi-ai/commit/a9de20880a566b6c67528f434a1191cfdaac889a))
 
 * chore(release): bump version to 0.4.1 ([`bfa7da5`](https://github.com/BlueTursi/tursi-ai/commit/bfa7da5d0e828be7788c3d72289b2d6a4790ad50))
@@ -102,6 +108,10 @@
 * feat: add special handling for security patches in version bumping ([`c824a79`](https://github.com/BlueTursi/tursi-ai/commit/c824a79fe5afa09b53aae4c950c5e5adae7a4d67))
 
 ### Fix
+
+* fix: Remove invalid license-file field from pyproject.toml ([`f049143`](https://github.com/BlueTursi/tursi-ai/commit/f04914342fdcbaa9ef70e9645243c5e029f3e6f0))
+
+* fix: Add license-file field to fix twine metadata check ([`5c6a287`](https://github.com/BlueTursi/tursi-ai/commit/5c6a2879e9cf142830a10f58a74d33e9d4814ebf))
 
 * fix: Remove unused imports and fix line length in engine.py ([`31c2493`](https://github.com/BlueTursi/tursi-ai/commit/31c2493c51ad1123af32459e5dfcc271405d6752))
 
