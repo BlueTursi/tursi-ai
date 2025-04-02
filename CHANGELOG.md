@@ -5,6 +5,8 @@
 
 ### Chore
 
+* chore(release): bump version to 0.4.2 ([`a9de208`](https://github.com/BlueTursi/tursi-ai/commit/a9de20880a566b6c67528f434a1191cfdaac889a))
+
 * chore(release): bump version to 0.4.1 ([`bfa7da5`](https://github.com/BlueTursi/tursi-ai/commit/bfa7da5d0e828be7788c3d72289b2d6a4790ad50))
 
 * chore(release): bump version to 0.4.0 ([`e5aba20`](https://github.com/BlueTursi/tursi-ai/commit/e5aba20f9e85f063debfc4546205dae85355e5b0))
@@ -92,6 +94,10 @@
 * docs: update README with simplified instructions and features ([`4a5032e`](https://github.com/BlueTursi/tursi-ai/commit/4a5032ed0bd7eca5cd189704980c5029a6cb1f4e))
 
 ### Feature
+
+* feat: Add model quantization support ([`a914321`](https://github.com/BlueTursi/tursi-ai/commit/a914321ed52e1c6e413e04b58a775724297ce0e0))
+
+* feat: Add model quantization support ([`68bd2f4`](https://github.com/BlueTursi/tursi-ai/commit/68bd2f44df9d0aefa2615eea4880fdd1ef2e5c64))
 
 * feat: add special handling for security patches in version bumping ([`c824a79`](https://github.com/BlueTursi/tursi-ai/commit/c824a79fe5afa09b53aae4c950c5e5adae7a4d67))
 
