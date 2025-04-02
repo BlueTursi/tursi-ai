@@ -5,7 +5,6 @@ description = "A simple framework to deploy AI models locally with one command, 
 authors = ["Kresna Sucandra <kresnasucandra@gmail.com>"]
 readme = "README.md"
 license = "MIT"
-license-file = "LICENSE"
 packages = [{include = "tursi"}]
 repository = "https://github.com/BlueTursi/tursi-ai"
 
