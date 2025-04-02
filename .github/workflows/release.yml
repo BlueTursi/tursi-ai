@@ -3,8 +3,8 @@ name: Release
 on:
   push:
     tags:
-      - 'release/v*'  # Significant updates
-      - 'patch/v*'    # Patch updates
+      - 'release/v*'  # Breaking changes, major, and security updates
+      - 'patch/v*'    # Minor and regular patch updates
 
 permissions:
   contents: write
