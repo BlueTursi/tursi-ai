@@ -5,6 +5,8 @@
 
 ### Chore
 
+* chore(release): bump version to 0.3.2 ([`095dc35`](https://github.com/BlueTursi/tursi-ai/commit/095dc3580434c2d5df19199d407cb08247360bc3))
+
 * chore: Remove release workflow in favor of manual releases ([`37065bd`](https://github.com/BlueTursi/tursi-ai/commit/37065bdecb576b2dbdc7646076fc924aff7cd55a))
 
 * chore(release): bump version to 0.3.1 ([`08ab552`](https://github.com/BlueTursi/tursi-ai/commit/08ab5522d1ad4ea02a1a24487b9f6713f1af296f))
@@ -50,6 +52,8 @@
 * chore: remove legacy package files in favor of Poetry ([`55c645e`](https://github.com/BlueTursi/tursi-ai/commit/55c645e747805e130bbb13532d85fa90e388fb25))
 
 ### Ci
+
+* ci: Add new release workflow with improved Poetry and PyPI publishing ([`0b247f0`](https://github.com/BlueTursi/tursi-ai/commit/0b247f0e91d365290c01239ecd2b39b0896fbb27))
 
 * ci: Update versioning logic to use release/v* only for breaking changes, major, and security updates ([`78e2535`](https://github.com/BlueTursi/tursi-ai/commit/78e2535bf21de5d8c604b980d06b884a0ea42427))
 
