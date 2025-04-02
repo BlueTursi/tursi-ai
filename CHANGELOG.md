@@ -5,6 +5,8 @@
 
 ### Chore
 
+* chore(release): bump version to 0.4.0 ([`e5aba20`](https://github.com/BlueTursi/tursi-ai/commit/e5aba20f9e85f063debfc4546205dae85355e5b0))
+
 * chore(release): bump version to 0.2.9 ([`d74176c`](https://github.com/BlueTursi/tursi-ai/commit/d74176c6bb9c3b0c3c80fd60ab55381c4b0a70a1))
 
 * chore(release): rollback version to 0.2.8 ([`0d8327d`](https://github.com/BlueTursi/tursi-ai/commit/0d8327d6796245b6355464544640757d55fed05b))
@@ -34,6 +36,14 @@
 * chore: remove legacy package files in favor of Poetry ([`55c645e`](https://github.com/BlueTursi/tursi-ai/commit/55c645e747805e130bbb13532d85fa90e388fb25))
 
 ### Ci
+
+* ci: Update versioning logic to use release/v* only for breaking changes, major, and security updates ([`78e2535`](https://github.com/BlueTursi/tursi-ai/commit/78e2535bf21de5d8c604b980d06b884a0ea42427))
+
+* ci: Update release workflow to handle both release and patch tags ([`06fc501`](https://github.com/BlueTursi/tursi-ai/commit/06fc5010086756e04eecb257602362967c777cab))
+
+* ci: Update release workflow to match version-bump.yml logic ([`d23c76a`](https://github.com/BlueTursi/tursi-ai/commit/d23c76a22760d0870980cef7d166f030dea05f59))
+
+* ci: Update semantic-release config to match version-bump.yml logic ([`8143568`](https://github.com/BlueTursi/tursi-ai/commit/8143568f2d15bc83bb479fd03b5eb6a132b7fa9e))
 
 * ci: update version bump workflow to only create release tags for major versions, new features, and security patches ([`dbb73e9`](https://github.com/BlueTursi/tursi-ai/commit/dbb73e9b29d3c42f210df29be2db8f22b9a92bf6))
 
@@ -84,6 +94,14 @@
 * feat: add special handling for security patches in version bumping ([`c824a79`](https://github.com/BlueTursi/tursi-ai/commit/c824a79fe5afa09b53aae4c950c5e5adae7a4d67))
 
 ### Fix
+
+* fix: Revert semantic-release configuration to simpler version ([`eb326cc`](https://github.com/BlueTursi/tursi-ai/commit/eb326cc1781847c868309ba0c0fde807fbd9f2a3))
+
+* fix: Remove unsupported tag_prefix configuration ([`10568f2`](https://github.com/BlueTursi/tursi-ai/commit/10568f251a5629c1756de78d296b463fb542cf1b))
+
+* fix: Update semantic-release tag format to support different prefixes ([`6633e24`](https://github.com/BlueTursi/tursi-ai/commit/6633e24db85870e9ba5bbe37b8462889255076b8))
+
+* fix: Correct semantic-release tag_format configuration ([`fbea304`](https://github.com/BlueTursi/tursi-ai/commit/fbea304b38b7e6aba985480ffebbdaf13777a876))
 
 * fix: create valid SARIF file with required tool and results structure ([`9b10f6a`](https://github.com/BlueTursi/tursi-ai/commit/9b10f6ac8897cfcf9fc9c51dec275a61b88684be))
 
