@@ -5,11 +5,27 @@
 
 ### Chore
 
-* chore(release): Add quantization feature ([`694f6a9`](https://github.com/BlueTursi/tursi-ai/commit/694f6a9f1076f50b3717c36463878336a2fbc00a))
+* chore: Remove release workflow in favor of manual releases ([`37065bd`](https://github.com/BlueTursi/tursi-ai/commit/37065bdecb576b2dbdc7646076fc924aff7cd55a))
+
+* chore(release): bump version to 0.3.1 ([`08ab552`](https://github.com/BlueTursi/tursi-ai/commit/08ab5522d1ad4ea02a1a24487b9f6713f1af296f))
+
+* chore: Revert version to 0.3.0 for feature release ([`694f6a9`](https://github.com/BlueTursi/tursi-ai/commit/694f6a9f1076f50b3717c36463878336a2fbc00a))
+
+* chore: Remove semantic-release to prevent version conflicts ([`bf7e38d`](https://github.com/BlueTursi/tursi-ai/commit/bf7e38d8d33b0d7447e5e63faf90cc9d9838f122))
+
+* chore(release): bump version to 0.3.1 ([`d1bbf66`](https://github.com/BlueTursi/tursi-ai/commit/d1bbf66115899e1fcd9cc56383442c70221c20cb))
+
+* chore(release): bump version to 0.4.2 ([`a9de208`](https://github.com/BlueTursi/tursi-ai/commit/a9de20880a566b6c67528f434a1191cfdaac889a))
+
+* chore(release): bump version to 0.4.1 ([`bfa7da5`](https://github.com/BlueTursi/tursi-ai/commit/bfa7da5d0e828be7788c3d72289b2d6a4790ad50))
+
+* chore(release): bump version to 0.4.0 ([`e5aba20`](https://github.com/BlueTursi/tursi-ai/commit/e5aba20f9e85f063debfc4546205dae85355e5b0))
 
 * chore(release): bump version to 0.2.9 ([`d74176c`](https://github.com/BlueTursi/tursi-ai/commit/d74176c6bb9c3b0c3c80fd60ab55381c4b0a70a1))
 
 * chore(release): rollback version to 0.2.8 ([`0d8327d`](https://github.com/BlueTursi/tursi-ai/commit/0d8327d6796245b6355464544640757d55fed05b))
+
+* chore(release): bump version to 0.3.0 ([`9046a97`](https://github.com/BlueTursi/tursi-ai/commit/9046a97c51652c1aa4f3a9f23f25cabb41ffd323))
 
 * chore(release): bump version to 0.2.7 ([`4837e59`](https://github.com/BlueTursi/tursi-ai/commit/4837e59e43d0a120a979307213cac80075a0ae31))
 
@@ -84,6 +100,8 @@
 * ci: split version bump and release workflows ([`c0af908`](https://github.com/BlueTursi/tursi-ai/commit/c0af908e40c1ab8539a2af63672986d8f35a1827))
 
 ### Documentation
+
+* docs: Update CHANGELOG.md for v0.3.0 release ([`2c024e8`](https://github.com/BlueTursi/tursi-ai/commit/2c024e8b517328e2a401362d17a1d7961c147217))
 
 * docs: update README with simplified instructions and features ([`4a5032e`](https://github.com/BlueTursi/tursi-ai/commit/4a5032ed0bd7eca5cd189704980c5029a6cb1f4e))
 
@@ -233,35 +251,3 @@
 * Feat: Add tursi-engine placeholder ([`162c7a9`](https://github.com/BlueTursi/tursi-ai/commit/162c7a954282eac46431d4b30767d2f047659972))
 
 * first commit ([`ec19a6e`](https://github.com/BlueTursi/tursi-ai/commit/ec19a6e84c0d131e460d4634e86b47ff8eff828b))
-
-
-## v0.3.0 (2024-04-02)
-
-### Feature
-
-* feat: Add model quantization support ([`a914321`](https://github.com/BlueTursi/tursi-ai/commit/a914321ed52e1c6e413e04b58a775724297ce0e0))
-
-### Added
-
-* Dynamic and static quantization support using ONNX Runtime (4-bit and 8-bit)
-* Command line arguments for quantization mode and bits
-* Environment variable configuration support
-* Optimized inference with ONNX Runtime session options
-
-### Changed
-
-* Updated dependencies to include optimum, onnxruntime, accelerate, and onnx
-* Enhanced error handling and logging for quantization operations
-
-### Developer Experience
-
-* Added comprehensive test suite for quantization features
-* Improved test coverage with test_quantization.py and test_server.py
-* Enhanced documentation for quantization options
-
-### Fix
-
-* fix: Remove invalid license-file field from pyproject.toml ([`f049143`](https://github.com/BlueTursi/tursi-ai/commit/f04914342fdcbaa9ef70e9645243c5e029f3e6f0))
-* fix: Add license-file field to fix twine metadata check ([`5c6a287`](https://github.com/BlueTursi/tursi-ai/commit/5c6a2879e9cf142830a10f58a74d33e9d4814ebf))
-* fix: Remove unused imports and fix line length in engine.py ([`31c2493`](https://github.com/BlueTursi/tursi-ai/commit/31c2493c51ad1123af32459e5dfcc271405d6752))
-* fix: Revert semantic-release configuration to simpler version ([`eb326cc`](https://github.com/BlueTursi/tursi-ai/commit/eb326cc1781847c868309ba0c0fde807fbd9f2a3))
