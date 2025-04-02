@@ -75,7 +75,7 @@ jobs:
           draft: false
           prerelease: false
           tag_name: ${{ github.ref_name }}
-          release_name: Release v${{ steps.get_version.outputs.version }}
+          name: Release v${{ steps.get_version.outputs.version }}
           generate_release_notes: true
           
       - name: Upload to PyPI
