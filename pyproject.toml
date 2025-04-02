@@ -48,11 +48,10 @@ build_command = "pip install poetry && poetry build"
 version_toml = ["pyproject.toml:tool.poetry.version"]
 version_pattern = "v{version}"
 major_on_zero = true
-tag_format = "{tag_prefix}{version}"
+tag_format = "v{version}"
 tag_parser = r"v(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)"
 commit_parser = r"^(?P<type>new-feat|feat|fix|docs|style|refactor|perf|test|build|ci|chore)(?:\((?P<scope>[^()\s]+)\))?: (?P<description>.+)$"
 max_patch_version = 999
-tag_prefix = "patch/v"
 
 [build-system]
 requires = ["poetry-core"]
