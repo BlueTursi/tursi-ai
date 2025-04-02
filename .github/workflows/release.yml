@@ -3,7 +3,8 @@ name: Release
 on:
   push:
     tags:
-      - 'release/v*'  # Only trigger on significant updates
+      - 'release/v*'  # Significant updates
+      - 'patch/v*'    # Patch updates
 
 permissions:
   contents: write
@@ -46,7 +47,7 @@ jobs:
       - name: Extract version from tag
         id: get_version
         run: |
-          VERSION=${GITHUB_REF#refs/tags/release/v}
+          VERSION=${GITHUB_REF#refs/tags/*/v}
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Building release for version $VERSION"
           
