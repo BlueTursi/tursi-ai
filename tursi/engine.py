@@ -5,13 +5,9 @@ from flask import Flask, request, jsonify
 from dotenv import load_dotenv
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from transformers import pipeline, AutoModelForSequenceClassification
 from optimum.onnxruntime import ORTModelForSequenceClassification
-from optimum.exporters import TasksManager
 from transformers import AutoTokenizer
 import onnxruntime as ort
-import numpy as np
-import tempfile
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -72,7 +68,10 @@ def load_quantized_model(model_name: str):
             session_options=session_options
         )
         
-        logger.info(f"Model quantized successfully with {QUANTIZATION_MODE} {QUANTIZATION_BITS}-bit quantization!")
+        logger.info(
+            f"Model quantized successfully with {QUANTIZATION_MODE} "
+            f"{QUANTIZATION_BITS}-bit quantization!"
+        )
         return model, tokenizer
             
     except Exception as e:
