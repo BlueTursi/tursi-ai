@@ -2,32 +2,22 @@ name: Version Bump
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-
-permissions:
-  contents: write
-  pull-requests: write
+    branches:
+      - main
 
 jobs:
   version-bump:
     runs-on: ubuntu-latest
-    # Skip if the commit is from the bot or is a release commit
-    if: |
-      contains(github.event.head_commit.message, 'chore(release)') == false &&
-      github.actor != 'github-actions[bot]'
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Fetch all history for all branches and tags
+          fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
-          
+
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v4
         with:
           python-version: "3.11"
-          cache: 'pip'
 
       - name: Install Poetry
         uses: snok/install-poetry@v1
@@ -36,88 +26,15 @@ jobs:
           virtualenvs-create: true
           virtualenvs-in-project: true
 
-      - name: Cache virtual environment
-        uses: actions/cache@v3
-        with:
-          path: .venv
-          key: ${{ runner.os }}-python-${{ hashFiles('**/poetry.lock') }}
-
       - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: poetry install --no-interaction --no-root
+        run: |
+          poetry install --no-interaction
+          poetry run pip install python-semantic-release
 
-      - name: Install project
-        run: poetry install --no-interaction
-          
-      - name: Configure Git
-        run: |
-          git config --global user.name 'Tursi CI'
-          git config --global user.email 'ci@tursi.ai'
-          
-      - name: Get current version
-        id: get_version
-        run: |
-          CURRENT_VERSION=$(poetry version --short)
-          echo "Current version: $CURRENT_VERSION"
-          echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
-          
-      - name: Determine version bump
-        id: check_bump
-        run: |
-          # Check commit messages since last tag for version bump type
-          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "none")
-          if [ "$LAST_TAG" = "none" ]; then
-            COMMITS=$(git log --format=%B)
-          else
-            COMMITS=$(git log $LAST_TAG..HEAD --format=%B)
-          fi
-          
-          if echo "$COMMITS" | grep -q "BREAKING CHANGE"; then
-            # Major version bump
-            NEW_VERSION=$(echo ${{ steps.get_version.outputs.current_version }} | awk -F. '{print $1+1".0.0"}')
-            SIGNIFICANT=true
-            TAG_PREFIX="release/v"
-          elif echo "$COMMITS" | grep -q "security\|fix.*security\|patch.*security"; then
-            # Security patch - increment patch version regardless of semver
-            NEW_VERSION=$(echo ${{ steps.get_version.outputs.current_version }} | awk -F. '{print $1"."$2"."($3+1)}')
-            SIGNIFICANT=true
-            TAG_PREFIX="release/v"
-          elif echo "$COMMITS" | grep -q "^new-feat"; then
-            # Minor version bump
-            NEW_VERSION=$(echo ${{ steps.get_version.outputs.current_version }} | awk -F. '{print $1"."($2+1)".0"}')
-            SIGNIFICANT=false
-            TAG_PREFIX="patch/v"
-          elif echo "$COMMITS" | grep -qE "^(fix|docs|ci|test)"; then
-            # Regular patch version bump - allow up to 999
-            CURRENT_PATCH=$(echo ${{ steps.get_version.outputs.current_version }} | awk -F. '{print $3}')
-            if [ "$CURRENT_PATCH" -ge 999 ]; then
-              # If patch version is 999 or higher, increment minor version
-              NEW_VERSION=$(echo ${{ steps.get_version.outputs.current_version }} | awk -F. '{print $1"."($2+1)".0"}')
-              SIGNIFICANT=false
-              TAG_PREFIX="patch/v"
-            else
-              # Normal patch version increment
-              NEW_VERSION=$(echo ${{ steps.get_version.outputs.current_version }} | awk -F. '{print $1"."$2"."($3+1)}')
-              SIGNIFICANT=false
-              TAG_PREFIX="patch/v"
-            fi
-          else
-            NEW_VERSION=${{ steps.get_version.outputs.current_version }}
-            SIGNIFICANT=false
-            TAG_PREFIX="patch/v"
-          fi
-          echo "New version: $NEW_VERSION"
-          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
-          echo "significant=$SIGNIFICANT" >> $GITHUB_OUTPUT
-          echo "tag_prefix=$TAG_PREFIX" >> $GITHUB_OUTPUT
-          
       - name: Update version and changelog
-        if: steps.check_bump.outputs.new_version != steps.get_version.outputs.current_version
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Update version in pyproject.toml
-          poetry version ${{ steps.check_bump.outputs.new_version }}
+          poetry version patch
           
           # Generate changelog
           poetry run semantic-release changelog > new_changes.md
@@ -133,9 +50,9 @@ jobs:
           
           # Commit changes
           git add pyproject.toml CHANGELOG.md
-          git commit -m "chore(release): bump version to ${{ steps.check_bump.outputs.new_version }}"
+          git commit -m "chore(release): bump version to $(poetry version -s)"
           git push origin HEAD:main
           
           # Create and push tag
-          git tag -a "${{ steps.check_bump.outputs.tag_prefix }}${{ steps.check_bump.outputs.new_version }}" -m "${{ steps.check_bump.outputs.tag_prefix }}${{ steps.check_bump.outputs.new_version }}"
-          git push origin "${{ steps.check_bump.outputs.tag_prefix }}${{ steps.check_bump.outputs.new_version }}" 
+          git tag -a "patch/v$(poetry version -s)" -m "patch/v$(poetry version -s)"
+          git push origin "patch/v$(poetry version -s)" 
