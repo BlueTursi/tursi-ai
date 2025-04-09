@@ -40,18 +40,40 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-python-
 
-      - name: Install dependencies
-        run: poetry install --no-interaction --no-root
-
-      - name: Install project
-        run: poetry install --no-interaction
-          
       - name: Extract version from tag
         id: get_version
         run: |
           VERSION=${GITHUB_REF#refs/tags/*/v}
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Building release for version $VERSION"
+
+      - name: Update pyproject.toml version
+        run: |
+          # Install required tools
+          pip install tomli tomli-w
+          
+          # Update version in pyproject.toml
+          python -c "
+          import tomli
+          import tomli_w
+          
+          with open('pyproject.toml', 'rb') as f:
+              config = tomli.load(f)
+          
+          config['tool']['poetry']['version'] = '${{ steps.get_version.outputs.version }}'
+          
+          with open('pyproject.toml', 'wb') as f:
+              tomli_w.dump(config, f)
+          "
+          
+          # Verify the change
+          cat pyproject.toml | grep version
+
+      - name: Install dependencies
+        run: poetry install --no-interaction --no-root
+
+      - name: Install project
+        run: poetry install --no-interaction
           
       - name: Build package
         run: |
