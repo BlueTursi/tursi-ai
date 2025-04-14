@@ -61,3 +61,7 @@ build/
 
 # Local development tools
 bin/
+
+# Node.js
+node_modules/
+package-lock.json

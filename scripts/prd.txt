@@ -1,0 +1,91 @@
+# Tursi AI - Product Requirements Document
+
+## Overview
+Tursi AI is a framework designed to deploy AI models locally with a single command, eliminating the need for containers. It focuses on efficient model quantization for reduced memory usage and faster inference.
+
+## Core Features
+
+### 1. Model Deployment
+- One-command deployment of AI models
+- No containerization required
+- Simple API interface
+- Support for various model types and architectures
+
+### 2. Model Optimization
+- Dynamic and static quantization support
+- 4-bit and 8-bit quantization options
+- CPU-optimized inference
+- Memory-efficient model loading
+
+### 3. API and Security
+- RESTful API interface
+- Rate limiting capabilities
+- Input validation
+- Error handling
+- Secure model loading
+
+### 4. Development and Testing
+- Comprehensive test coverage
+- Automated testing pipeline
+- Poetry dependency management
+- CI/CD integration
+
+## Technical Requirements
+
+### 1. Model Deployment
+- Support for Hugging Face Transformers models
+- ONNX Runtime integration
+- PyTorch compatibility
+- Flask-based API server
+
+### 2. Quantization Options
+- Dynamic quantization (runtime)
+- Static quantization (load-time)
+- 4-bit quantization for resource-constrained environments
+- 8-bit quantization for balanced performance
+
+### 3. API Endpoints
+- POST /predict
+  - Input: JSON with text field
+  - Output: JSON with label and score
+- Rate limiting configuration
+- Error response handling
+
+### 4. Configuration Options
+- Environment variables for customization:
+  - RATE_LIMIT
+  - RATE_LIMIT_STORAGE_URI
+  - QUANTIZATION_MODE
+  - QUANTIZATION_BITS
+
+## Performance Requirements
+- Efficient memory usage through quantization
+- Fast inference times
+- Scalable API endpoints
+- Reliable error handling
+
+## Security Requirements
+- Input validation
+- Rate limiting
+- Secure model loading
+- Error message sanitization
+
+## Development Requirements
+- Python 3.11+ compatibility
+- Poetry for dependency management
+- Comprehensive test coverage
+- Automated CI/CD pipeline
+
+## Future Enhancements
+1. GPU acceleration support
+2. Additional model formats
+3. Enhanced quantization options
+4. Extended API features
+5. Monitoring and logging capabilities
+
+## Success Metrics
+- Model inference speed
+- Memory usage reduction
+- API response times
+- Test coverage percentage
+- Deployment success rate 
