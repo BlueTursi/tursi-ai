@@ -80,10 +80,21 @@ jobs:
           poetry run python --version
           poetry run pip list
           
-          # Build the package
-          poetry build
+          # Show current directory structure
+          echo "Current directory structure:"
+          ls -R
+          
+          # Show package contents
+          echo "Package contents:"
+          cat tursi/__init__.py
+          echo "---"
+          cat tursi/engine.py
+          
+          # Build the package with verbose output
+          poetry build -vvv
           
           # Verify the built files
+          echo "Built files:"
           ls -l dist/
           poetry run twine check dist/*
           
