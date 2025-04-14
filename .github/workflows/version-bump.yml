@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    types: [labeled]
 
 jobs:
   version-bump:
@@ -31,18 +33,50 @@ jobs:
           poetry install --no-interaction
           poetry run pip install python-semantic-release
 
+      - name: Determine version bump type
+        id: version_type
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            if [[ "${{ github.event.label.name }}" == "major" ]]; then
+              echo "type=major" >> $GITHUB_OUTPUT
+              echo "tag_prefix=release/v" >> $GITHUB_OUTPUT
+            elif [[ "${{ github.event.label.name }}" == "minor" ]]; then
+              echo "type=minor" >> $GITHUB_OUTPUT
+              echo "tag_prefix=release/v" >> $GITHUB_OUTPUT
+            else
+              echo "type=patch" >> $GITHUB_OUTPUT
+              echo "tag_prefix=patch/v" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "type=patch" >> $GITHUB_OUTPUT
+            echo "tag_prefix=patch/v" >> $GITHUB_OUTPUT
+          fi
+
       - name: Update version and changelog
         run: |
-          # Update version in pyproject.toml
-          poetry version patch
+          # Update version based on type
+          if [[ "${{ steps.version_type.outputs.type }}" == "major" ]]; then
+            poetry version major
+          elif [[ "${{ steps.version_type.outputs.type }}" == "minor" ]]; then
+            poetry version minor
+          else
+            poetry version patch
+          fi
           
-          # Generate changelog
-          poetry run semantic-release changelog > new_changes.md
+          # Generate detailed changelog
+          poetry run semantic-release changelog --unreleased > new_changes.md
+          
+          # Add version header
+          echo "# Version $(poetry version -s) ($(date +%Y-%m-%d))" > version_changes.md
+          echo "" >> version_changes.md
+          cat new_changes.md >> version_changes.md
+          
+          # Update main changelog
           if [ -f CHANGELOG.md ]; then
-            cat new_changes.md CHANGELOG.md > temp_changelog.md
+            cat version_changes.md CHANGELOG.md > temp_changelog.md
             mv temp_changelog.md CHANGELOG.md
           else
-            mv new_changes.md CHANGELOG.md
+            mv version_changes.md CHANGELOG.md
           fi
           
           # Show the changes
@@ -53,6 +87,6 @@ jobs:
           git commit -m "chore(release): bump version to $(poetry version -s)"
           git push origin HEAD:main
           
-          # Create and push tag
-          git tag -a "patch/v$(poetry version -s)" -m "patch/v$(poetry version -s)"
-          git push origin "patch/v$(poetry version -s)" 
+          # Create and push tag with appropriate prefix
+          git tag -a "${{ steps.version_type.outputs.tag_prefix }}$(poetry version -s)" -m "${{ steps.version_type.outputs.tag_prefix }}$(poetry version -s)"
+          git push origin "${{ steps.version_type.outputs.tag_prefix }}$(poetry version -s)" 
