@@ -1,219 +1,227 @@
 import argparse
 import os
 import logging
+import sys
+from pathlib import Path
 from flask import Flask, request, jsonify
 from dotenv import load_dotenv
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from optimum.onnxruntime import ORTModelForSequenceClassification
-from transformers import AutoTokenizer
+from transformers import AutoTokenizer, AutoConfig
 import onnxruntime as ort
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-# Load environment variables
-load_dotenv()
-
-# Security constants
-MAX_INPUT_LENGTH = 512  # Maximum length of input text
-ALLOWED_MODELS = [
-    "distilbert-base-uncased-finetuned-sst-2-english",
-    # Add other allowed models here
-]
-
-# Rate limiting constants
-RATE_LIMIT = "100 per minute"  # Adjust based on your needs
-RATE_LIMIT_STORAGE_URI = os.getenv("RATE_LIMIT_STORAGE_URI", "memory://")
-
-# Quantization settings
-QUANTIZATION_MODE = os.getenv("QUANTIZATION_MODE", "dynamic")  # dynamic or static
-QUANTIZATION_BITS = int(os.getenv("QUANTIZATION_BITS", "8"))  # 8 or 4 bits
-
-
-def validate_input(text: str) -> bool:
-    """Validate input text for security."""
-    if not isinstance(text, str):
-        return False
-    if len(text) > MAX_INPUT_LENGTH:
-        return False
-    # Add more validation as needed
-    return True
-
-
-def sanitize_model_name(model_name: str) -> str:
-    """Sanitize model name for security."""
-    # Add model name sanitization logic here
-    return model_name
-
-
-def load_quantized_model(model_name: str):
-    """Load a quantized model using ONNX Runtime."""
-    try:
-        logger.info(f"Loading quantized model: {model_name}...")
-        
-        # Load tokenizer
-        tokenizer = AutoTokenizer.from_pretrained(model_name)
-        
-        # Configure ONNX Runtime session options
-        session_options = ort.SessionOptions()
-        session_options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
-        session_options.intra_op_num_threads = 1
-        
-        # Load model with quantization
-        model = ORTModelForSequenceClassification.from_pretrained(
-            model_name,
-            export=True,
-            session_options=session_options
-        )
-        
-        logger.info(
-            f"Model quantized successfully with {QUANTIZATION_MODE} "
-            f"{QUANTIZATION_BITS}-bit quantization!"
-        )
-        return model, tokenizer
-            
-    except Exception as e:
-        logger.error(f"Failed to load quantized model: {str(e)}")
-        raise
-
-
-def create_app(model_name: str, rate_limit: str = RATE_LIMIT):
-    """Create and configure the Flask application."""
-    try:
-        # Validate model name
-        if model_name not in ALLOWED_MODELS:
-            raise ValueError(f"Model {model_name} is not in the allowed list")
-
-        # Sanitize model name
-        model_name = sanitize_model_name(model_name)
-        
-        # Load model with quantization
-        model, tokenizer = load_quantized_model(model_name)
-        logger.info("Model loaded successfully!")
-    except ValueError as e:
-        logger.error(f"Invalid model: {str(e)}")
-        raise
-    except Exception as e:
-        logger.error(f"Failed to load model: {str(e)}")
-        raise
-
-    app = Flask(__name__)
+class TursiEngine:
+    """Main engine class for Tursi AI model deployment."""
     
-    # Store rate limit in app config
-    app.config['RATE_LIMIT'] = rate_limit
-    
-    # Initialize rate limiter
-    limiter = Limiter(
-        app=app,
-        key_func=get_remote_address,
-        storage_uri=RATE_LIMIT_STORAGE_URI,
-        default_limits=[rate_limit],
-        strategy="fixed-window"
-    )
+    def __init__(self):
+        # Configure logging
+        logging.basicConfig(level=logging.INFO)
+        self.logger = logging.getLogger(__name__)
 
-    @app.route("/predict", methods=["POST"])
-    @limiter.limit(rate_limit)
-    def predict():
+        # Load environment variables
+        load_dotenv()
+
+        # Security constants
+        self.MAX_INPUT_LENGTH = 512  # Maximum length of input text
+        self.ALLOWED_MODELS = [
+            "distilbert-base-uncased-finetuned-sst-2-english",
+            # Add other allowed models here
+        ]
+
+        # Rate limiting constants
+        self.RATE_LIMIT = "100 per minute"  # Adjust based on your needs
+        self.RATE_LIMIT_STORAGE_URI = os.getenv("RATE_LIMIT_STORAGE_URI", "memory://")
+
+        # Quantization settings
+        self.QUANTIZATION_MODE = os.getenv("QUANTIZATION_MODE", "dynamic")  # dynamic or static
+        self.QUANTIZATION_BITS = int(os.getenv("QUANTIZATION_BITS", "8"))  # 8 or 4 bits
+
+        # Model storage
+        self.MODEL_CACHE_DIR = Path.home() / ".tursi" / "models"
+        self.setup_model_cache()
+
+    def setup_model_cache(self):
+        """Create model cache directory if it doesn't exist."""
+        self.MODEL_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+        self.logger.info(f"Model cache directory: {self.MODEL_CACHE_DIR}")
+
+    def validate_input(self, text: str) -> bool:
+        """Validate input text for security."""
+        if not isinstance(text, str):
+            return False
+        if len(text) > self.MAX_INPUT_LENGTH:
+            return False
+        # Add more validation as needed
+        return True
+
+    def sanitize_model_name(self, model_name: str) -> str:
+        """Sanitize model name for security."""
+        # Remove any path traversal attempts
+        return os.path.basename(model_name)
+
+    def check_model_compatibility(self, model_name: str) -> bool:
+        """Check if the model is compatible with our system."""
         try:
-            if not request.is_json:
-                return jsonify({"error": "Request must be JSON"}), 400
-
-            data = request.get_json()
-            if not data or "text" not in data:
-                return jsonify({
-                    "error": "Missing 'text' field in request"
-                }), 400
-
-            text = data.get("text", "")
-
-            # Validate input
-            if not validate_input(text):
-                return jsonify({
-                    "error": (
-                        "Invalid input. Text must be a string of maximum "
-                        "length 512 characters."
-                    )
-                }), 400
-
-            # Tokenize input
-            inputs = tokenizer(text, return_tensors="pt", padding=True, truncation=True)
-            
-            # Run inference
-            outputs = model(**inputs)
-            predictions = outputs.logits.softmax(dim=-1)
-            
-            # Get prediction
-            label = "POSITIVE" if predictions[0][1] > predictions[0][0] else "NEGATIVE"
-            score = float(predictions[0][1] if label == "POSITIVE" else predictions[0][0])
-            
-            return jsonify({"label": label, "score": score})
+            config = AutoConfig.from_pretrained(model_name)
+            # Check if model architecture is supported
+            supported_architectures = ["DistilBert", "Bert", "RoBERTa", "GPT2"]
+            return any(arch.lower() in config.architectures[0].lower() 
+                      for arch in supported_architectures)
         except Exception as e:
-            logger.error(f"Error during prediction: {str(e)}")
-            return jsonify({"error": "Internal server error"}), 500
+            self.logger.error(f"Error checking model compatibility: {str(e)}")
+            return False
 
-    return app
+    def load_quantized_model(self, model_name: str):
+        """Load a quantized model using ONNX Runtime."""
+        try:
+            self.logger.info(f"Loading quantized model: {model_name}...")
+            
+            # Load tokenizer
+            tokenizer = AutoTokenizer.from_pretrained(
+                model_name,
+                cache_dir=self.MODEL_CACHE_DIR
+            )
+            
+            # Configure ONNX Runtime session options
+            session_options = ort.SessionOptions()
+            session_options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
+            session_options.intra_op_num_threads = 1
+            
+            # Load model with quantization
+            model = ORTModelForSequenceClassification.from_pretrained(
+                model_name,
+                export=True,
+                session_options=session_options,
+                cache_dir=self.MODEL_CACHE_DIR
+            )
+            
+            self.logger.info(
+                f"Model quantized successfully with {self.QUANTIZATION_MODE} "
+                f"{self.QUANTIZATION_BITS}-bit quantization!"
+            )
+            return model, tokenizer
+                
+        except Exception as e:
+            self.logger.error(f"Failed to load quantized model: {str(e)}")
+            raise
 
+    def download_model(self, model_name: str) -> bool:
+        """Download model and tokenizer files."""
+        try:
+            self.logger.info(f"Downloading model: {model_name}")
+            AutoTokenizer.from_pretrained(model_name, cache_dir=self.MODEL_CACHE_DIR)
+            AutoConfig.from_pretrained(model_name, cache_dir=self.MODEL_CACHE_DIR)
+            return True
+        except Exception as e:
+            self.logger.error(f"Failed to download model: {str(e)}")
+            return False
+
+    def create_app(self, model_name: str, rate_limit: str = None):
+        """Create and configure the Flask application."""
+        if rate_limit is None:
+            rate_limit = self.RATE_LIMIT
+            
+        try:
+            # Validate model name
+            if model_name not in self.ALLOWED_MODELS:
+                raise ValueError(f"Model {model_name} is not in the allowed list")
+
+            # Sanitize model name
+            model_name = self.sanitize_model_name(model_name)
+            
+            # Load model with quantization
+            model, tokenizer = self.load_quantized_model(model_name)
+            self.logger.info("Model loaded successfully!")
+        except ValueError as e:
+            self.logger.error(f"Invalid model: {str(e)}")
+            raise
+        except Exception as e:
+            self.logger.error(f"Failed to load model: {str(e)}")
+            raise
+
+        app = Flask(__name__)
+        
+        # Store rate limit in app config
+        app.config['RATE_LIMIT'] = rate_limit
+        
+        # Initialize rate limiter
+        limiter = Limiter(
+            app=app,
+            key_func=get_remote_address,
+            storage_uri=self.RATE_LIMIT_STORAGE_URI,
+            default_limits=[rate_limit],
+            strategy="fixed-window"
+        )
+
+        @app.route("/predict", methods=["POST"])
+        @limiter.limit(rate_limit)
+        def predict():
+            try:
+                if not request.is_json:
+                    return jsonify({"error": "Request must be JSON"}), 400
+
+                data = request.get_json()
+                if not data or "text" not in data:
+                    return jsonify({
+                        "error": "Missing 'text' field in request"
+                    }), 400
+
+                text = data.get("text", "")
+
+                # Validate input
+                if not self.validate_input(text):
+                    return jsonify({
+                        "error": (
+                            "Invalid input. Text must be a string of maximum "
+                            "length 512 characters."
+                        )
+                    }), 400
+
+                # Tokenize input
+                inputs = tokenizer(text, return_tensors="pt", padding=True, truncation=True)
+                
+                # Run inference
+                outputs = model(**inputs)
+                predictions = outputs.logits.softmax(dim=-1)
+                
+                # Get prediction
+                label = "POSITIVE" if predictions[0][1] > predictions[0][0] else "NEGATIVE"
+                score = float(predictions[0][1] if label == "POSITIVE" else predictions[0][0])
+                
+                return jsonify({"label": label, "score": score})
+            except Exception as e:
+                self.logger.error(f"Error during prediction: {str(e)}")
+                return jsonify({"error": "Internal server error"}), 500
+
+        @app.route("/health", methods=["GET"])
+        def health_check():
+            """Health check endpoint."""
+            return jsonify({
+                "status": "healthy",
+                "model": model_name,
+                "quantization": {
+                    "mode": self.QUANTIZATION_MODE,
+                    "bits": self.QUANTIZATION_BITS
+                }
+            })
+
+        return app
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="tursi-engine: Deploy an AI model with Flask"
-    )
-    parser.add_argument(
-        "command",
-        choices=["up"],
-        help="Command to run ('up' to start the server)"
-    )
-    parser.add_argument(
-        "--model",
-        default="distilbert-base-uncased-finetuned-sst-2-english",
-        help="Model name from Hugging Face"
-    )
-    parser.add_argument(
-        "--host",
-        default="0.0.0.0",
-        help="Host to run the server on (default: 0.0.0.0)"
-    )
-    parser.add_argument(
-        "--port",
-        type=int,
-        default=5000,
-        help="Port to run the server on (default: 5000)"
-    )
-    parser.add_argument(
-        "--rate-limit",
-        default=RATE_LIMIT,
-        help="Rate limit for API requests (default: 100 per minute)"
-    )
-    parser.add_argument(
-        "--quantization-mode",
-        choices=["dynamic", "static"],
-        default=QUANTIZATION_MODE,
-        help="Quantization mode (default: dynamic)"
-    )
-    parser.add_argument(
-        "--quantization-bits",
-        type=int,
-        choices=[4, 8],
-        default=QUANTIZATION_BITS,
-        help="Number of bits for quantization (default: 8)"
-    )
+    """Main entry point for the CLI."""
+    parser = argparse.ArgumentParser(description="Tursi AI Model Deployment")
+    parser.add_argument("--model", type=str, required=True, help="Model name to deploy")
+    parser.add_argument("--rate-limit", type=str, help="Rate limit (e.g., '100 per minute')")
     args = parser.parse_args()
 
-    if args.command == "up":
-        # Update quantization settings from command line
-        os.environ["QUANTIZATION_MODE"] = args.quantization_mode
-        os.environ["QUANTIZATION_BITS"] = str(args.quantization_bits)
-        
-        app = create_app(args.model, args.rate_limit)
-        logger.info(
-            f"Deploying at http://{args.host}:{args.port}/predict "
-            f"with rate limit: {args.rate_limit} "
-            f"and {args.quantization_mode} {args.quantization_bits}-bit quantization"
-        )
-        app.run(host=args.host, port=args.port, debug=False)
-
+    try:
+        engine = TursiEngine()
+        app = engine.create_app(args.model, args.rate_limit)
+        app.run(host="0.0.0.0", port=5000)
+    except Exception as e:
+        print(f"Error: {str(e)}", file=sys.stderr)
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()
