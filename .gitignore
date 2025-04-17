@@ -37,7 +37,7 @@ ENV/
 *.swo
 *~
 .cursor
-
+.windsurfrules
 # Testing
 .coverage
 htmlcov/
