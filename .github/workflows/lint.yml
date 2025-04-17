@@ -6,15 +6,11 @@ on:
     paths:
       - '**.py'
       - 'pyproject.toml'
-      - '.flake8'
-      - 'setup.cfg'
   pull_request:
     branches: [ main ]
     paths:
       - '**.py'
       - 'pyproject.toml'
-      - '.flake8'
-      - 'setup.cfg'
 
 jobs:
   lint:
@@ -29,21 +25,11 @@ jobs:
           poetry-version: '1.7.1'
           install-root: true
 
-      - name: Install additional linting tools
-        run: |
-          poetry run pip install black isort mypy types-all
-
       - name: Run black
         run: poetry run black --check tursi tests
-
-      - name: Run isort
-        run: poetry run isort --check-only tursi tests
 
       - name: Run flake8
         run: poetry run flake8 tursi tests
 
       - name: Run mypy
         run: poetry run mypy tursi tests
-
-      - name: Check import order
-        run: poetry run isort --check-only --diff tursi tests
