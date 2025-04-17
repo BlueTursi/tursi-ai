@@ -1,5 +1,18 @@
 name: Lint
-on: [push]
+on:
+  push:
+    branches: [ main, 'release/*' ]
+    paths:
+      - '**.py'
+      - 'pyproject.toml'
+      - '.flake8'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - '**.py'
+      - 'pyproject.toml'
+      - '.flake8'
+
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -33,4 +46,4 @@ jobs:
         run: poetry install --no-interaction
 
       - name: Run flake8
-        run: poetry run flake8 tursi
+        run: poetry run flake8 tursi tests
