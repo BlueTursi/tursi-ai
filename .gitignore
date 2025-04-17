@@ -83,3 +83,11 @@ ehthumbs.db
 Thumbs.db
 .cursor/
 build/
+
+# Python build and cache
+__pycache__/
+*.py[cod]
+*.so
+dist/
+*.egg-info/
+.eggs/
