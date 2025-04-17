@@ -5,10 +5,12 @@ from tursi.engine import TursiEngine
 # Test model name
 TEST_MODEL = "distilbert-base-uncased-finetuned-sst-2-english"
 
+
 @pytest.fixture
 def engine():
     """Create a TursiEngine instance for testing."""
     return TursiEngine()
+
 
 def test_quantization_loading(engine):
     """Test that model loads successfully with quantization."""
@@ -16,9 +18,10 @@ def test_quantization_loading(engine):
         model, tokenizer = engine.load_quantized_model(TEST_MODEL)
         assert model is not None
         assert tokenizer is not None
-        assert hasattr(model, 'forward'), "Model should have forward method"
+        assert hasattr(model, "forward"), "Model should have forward method"
     except Exception as e:
         pytest.fail(f"Failed to load quantized model: {str(e)}")
+
 
 def test_quantized_inference(engine):
     """Test inference with quantized model."""
@@ -46,6 +49,7 @@ def test_quantized_inference(engine):
 
     # Sum of probabilities should be close to 1
     assert abs(float(predictions.sum()) - 1.0) < 1e-6, "Probabilities should sum to 1"
+
 
 def test_quantization_settings(engine):
     """Test that quantization settings are properly set."""

@@ -1,4 +1,5 @@
 """SQLite database integration for Tursi daemon state persistence."""
+
 import sqlite3
 import json
 from pathlib import Path
@@ -7,6 +8,7 @@ from typing import Optional, Dict, List
 import logging
 
 logger = logging.getLogger(__name__)
+
 
 class TursiDB:
     """Database manager for Tursi daemon."""
@@ -102,7 +104,7 @@ class TursiDB:
                     # Insert initial schema version
                     conn.execute(
                         "INSERT INTO schema_version (version, applied_at) VALUES (?, ?)",
-                        (1, datetime.now(UTC).isoformat())
+                        (1, datetime.now(UTC).isoformat()),
                     )
                 logger.info(f"Database initialized at {self.db_path}")
         except sqlite3.Error as e:
@@ -136,15 +138,16 @@ class TursiDB:
                         conn.executescript(self.MIGRATIONS[version])
                         conn.execute(
                             "INSERT INTO schema_version (version, applied_at) VALUES (?, ?)",
-                            (version, datetime.now(UTC).isoformat())
+                            (version, datetime.now(UTC).isoformat()),
                         )
                 logger.info("Database migrations completed successfully")
         except sqlite3.Error as e:
             logger.error(f"Failed to run migrations: {e}")
             raise
 
-    def add_deployment(self, model_name: str, process_id: int, host: str, port: int,
-                      config: Dict) -> int:
+    def add_deployment(
+        self, model_name: str, process_id: int, host: str, port: int, config: Dict
+    ) -> int:
         """Add a new model deployment record.
 
         Args:
@@ -166,8 +169,16 @@ class TursiDB:
                     (model_name, process_id, host, port, status, config, created_at, updated_at)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                     """,
-                    (model_name, process_id, host, port, "running",
-                     json.dumps(config), now, now)
+                    (
+                        model_name,
+                        process_id,
+                        host,
+                        port,
+                        "running",
+                        json.dumps(config),
+                        now,
+                        now,
+                    ),
                 )
                 return cursor.lastrowid
         except sqlite3.Error as e:
@@ -190,7 +201,7 @@ class TursiDB:
                     SET status = ?, updated_at = ?
                     WHERE id = ?
                     """,
-                    (status, now, deployment_id)
+                    (status, now, deployment_id),
                 )
         except sqlite3.Error as e:
             logger.error(f"Failed to update deployment status: {e}")
@@ -208,8 +219,7 @@ class TursiDB:
         try:
             with self._get_connection() as conn:
                 cursor = conn.execute(
-                    "SELECT * FROM model_deployments WHERE id = ?",
-                    (deployment_id,)
+                    "SELECT * FROM model_deployments WHERE id = ?", (deployment_id,)
                 )
                 row = cursor.fetchone()
                 if row:
@@ -252,7 +262,7 @@ class TursiDB:
                     (deployment_id, level, message, created_at)
                     VALUES (?, ?, ?, ?)
                     """,
-                    (deployment_id, level, message, now)
+                    (deployment_id, level, message, now),
                 )
         except sqlite3.Error as e:
             logger.error(f"Failed to add log: {e}")
@@ -277,7 +287,7 @@ class TursiDB:
                     ORDER BY created_at DESC
                     LIMIT ?
                     """,
-                    (deployment_id, limit)
+                    (deployment_id, limit),
                 )
                 return [dict(row) for row in cursor.fetchall()]
         except sqlite3.Error as e:
@@ -301,7 +311,7 @@ class TursiDB:
                     (deployment_id, cpu_percent, memory_mb, created_at)
                     VALUES (?, ?, ?, ?)
                     """,
-                    (deployment_id, cpu_percent, memory_mb, now)
+                    (deployment_id, cpu_percent, memory_mb, now),
                 )
         except sqlite3.Error as e:
             logger.error(f"Failed to add metrics: {e}")
@@ -326,7 +336,7 @@ class TursiDB:
                     ORDER BY created_at DESC
                     LIMIT ?
                     """,
-                    (deployment_id, limit)
+                    (deployment_id, limit),
                 )
                 return [dict(row) for row in cursor.fetchall()]
         except sqlite3.Error as e:
@@ -340,14 +350,16 @@ class TursiDB:
             max_age_hours: Maximum age of metrics to keep in hours
         """
         try:
-            cutoff_time = (datetime.now(UTC) - timedelta(hours=max_age_hours)).isoformat()
+            cutoff_time = (
+                datetime.now(UTC) - timedelta(hours=max_age_hours)
+            ).isoformat()
             with self._get_connection() as conn:
                 conn.execute(
                     """
                     DELETE FROM resource_metrics
                     WHERE created_at < ?
                     """,
-                    (cutoff_time,)
+                    (cutoff_time,),
                 )
         except sqlite3.Error as e:
             logger.error(f"Failed to cleanup metrics: {e}")

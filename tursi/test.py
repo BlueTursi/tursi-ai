@@ -8,14 +8,10 @@ def main():
         description="tursi-test: Test a deployed tursi model"
     )
     parser.add_argument(
-        "--prompt",
-        required=True,
-        help="Text to send to the model (e.g., 'I love AI')"
+        "--prompt", required=True, help="Text to send to the model (e.g., 'I love AI')"
     )
     parser.add_argument(
-        "--url",
-        default="http://localhost:5000/predict",
-        help="URL of the tursi server"
+        "--url", default="http://localhost:5000/predict", help="URL of the tursi server"
     )
     args = parser.parse_args()
 

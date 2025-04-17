@@ -1,4 +1,5 @@
 """Model management and deployment for Tursi."""
+
 import os
 import logging
 import torch
@@ -10,10 +11,13 @@ import threading
 
 logger = logging.getLogger(__name__)
 
+
 class ModelServer:
     """Flask server for model inference."""
 
-    def __init__(self, model_name: str, model, tokenizer, rate_limit: Optional[str] = None):
+    def __init__(
+        self, model_name: str, model, tokenizer, rate_limit: Optional[str] = None
+    ):
         """Initialize model server.
 
         Args:
@@ -35,26 +39,24 @@ class ModelServer:
             from flask_limiter.util import get_remote_address
 
             self.limiter = Limiter(
-                app=self.app,
-                key_func=get_remote_address,
-                default_limits=[rate_limit]
+                app=self.app, key_func=get_remote_address, default_limits=[rate_limit]
             )
 
     def _setup_routes(self):
         """Configure API routes."""
-        self.app.route('/v1/generate', methods=['POST'])(self.generate)
-        self.app.route('/v1/health', methods=['GET'])(self.health_check)
+        self.app.route("/v1/generate", methods=["POST"])(self.generate)
+        self.app.route("/v1/health", methods=["GET"])(self.health_check)
 
     def generate(self):
         """Generate text from the model."""
         try:
             data = request.get_json()
-            if not data or 'prompt' not in data:
+            if not data or "prompt" not in data:
                 return jsonify({"error": "Missing prompt in request"}), 400
 
-            prompt = data['prompt']
-            max_length = data.get('max_length', 100)
-            temperature = data.get('temperature', 0.7)
+            prompt = data["prompt"]
+            max_length = data.get("max_length", 100)
+            temperature = data.get("temperature", 0.7)
 
             # Tokenize input
             inputs = self.tokenizer(prompt, return_tensors="pt")
@@ -65,15 +67,13 @@ class ModelServer:
                     inputs["input_ids"],
                     max_length=max_length,
                     temperature=temperature,
-                    pad_token_id=self.tokenizer.eos_token_id
+                    pad_token_id=self.tokenizer.eos_token_id,
                 )
 
             # Decode output
             generated_text = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
 
-            return jsonify({
-                "generated_text": generated_text
-            }), 200
+            return jsonify({"generated_text": generated_text}), 200
 
         except Exception as e:
             logger.error(f"Error in generate: {e}")
@@ -81,10 +81,8 @@ class ModelServer:
 
     def health_check(self):
         """Health check endpoint."""
-        return jsonify({
-            "status": "healthy",
-            "model": self.model_name
-        }), 200
+        return jsonify({"status": "healthy", "model": self.model_name}), 200
+
 
 class ModelManager:
     """Manager for model deployments."""
@@ -92,10 +90,16 @@ class ModelManager:
     def __init__(self):
         """Initialize the model manager."""
         self.models: Dict[str, Dict] = {}  # model_name -> {model, tokenizer, server}
-        self.servers: Dict[int, Dict] = {}  # port -> {thread, server_instance, stop_event}
+        self.servers: Dict[int, Dict] = (
+            {}
+        )  # port -> {thread, server_instance, stop_event}
 
-    def load_model(self, model_name: str, quantization: Optional[str] = None,
-                  bits: Optional[int] = None) -> tuple:
+    def load_model(
+        self,
+        model_name: str,
+        quantization: Optional[str] = None,
+        bits: Optional[int] = None,
+    ) -> tuple:
         """Load a model from Hugging Face.
 
         Args:
@@ -114,23 +118,24 @@ class ModelManager:
 
             # Configure quantization
             if quantization and bits:
-                if quantization not in ['dynamic', 'static']:
+                if quantization not in ["dynamic", "static"]:
                     raise ValueError("Quantization must be 'dynamic' or 'static'")
                 if bits not in [4, 8]:
                     raise ValueError("Bits must be 4 or 8")
 
                 from transformers import BitsAndBytesConfig
+
                 quantization_config = BitsAndBytesConfig(
                     load_in_4bit=(bits == 4),
                     load_in_8bit=(bits == 8),
-                    bnb_4bit_quant_type='nf4' if bits == 4 else None
+                    bnb_4bit_quant_type="nf4" if bits == 4 else None,
                 )
 
                 # Load model with quantization
                 model = AutoModelForCausalLM.from_pretrained(
                     model_name,
                     quantization_config=quantization_config,
-                    device_map="auto"
+                    device_map="auto",
                 )
             else:
                 # Load model without quantization
@@ -144,9 +149,15 @@ class ModelManager:
             logger.error(f"Error loading model {model_name}: {e}")
             raise
 
-    def deploy_model(self, model_name: str, host: str, port: int,
-                    quantization: Optional[str] = None, bits: Optional[int] = None,
-                    rate_limit: Optional[str] = None) -> None:
+    def deploy_model(
+        self,
+        model_name: str,
+        host: str,
+        port: int,
+        quantization: Optional[str] = None,
+        bits: Optional[int] = None,
+        rate_limit: Optional[str] = None,
+    ) -> None:
         """Deploy a model for inference.
 
         Args:
@@ -165,17 +176,14 @@ class ModelManager:
             # Load model if not already loaded
             if model_name not in self.models:
                 model, tokenizer = self.load_model(model_name, quantization, bits)
-                self.models[model_name] = {
-                    "model": model,
-                    "tokenizer": tokenizer
-                }
+                self.models[model_name] = {"model": model, "tokenizer": tokenizer}
 
             # Create server
             server = ModelServer(
                 model_name=model_name,
                 model=self.models[model_name]["model"],
                 tokenizer=self.models[model_name]["tokenizer"],
-                rate_limit=rate_limit
+                rate_limit=rate_limit,
             )
 
             # Create stop event
@@ -184,8 +192,7 @@ class ModelManager:
             # Create and start server thread
             server_instance = make_server(host, port, server.app)
             server_thread = threading.Thread(
-                target=self._run_server,
-                args=(server_instance, stop_event)
+                target=self._run_server, args=(server_instance, stop_event)
             )
             server_thread.daemon = True
             server_thread.start()
@@ -195,7 +202,7 @@ class ModelManager:
                 "thread": server_thread,
                 "server": server_instance,
                 "stop_event": stop_event,
-                "model_name": model_name
+                "model_name": model_name,
             }
 
             logger.info(f"Model {model_name} deployed on {host}:{port}")
@@ -239,6 +246,7 @@ class ModelManager:
             server: Server instance to run
             stop_event: Event to signal server shutdown
         """
+
         def shutdown_check():
             while not stop_event.is_set():
                 stop_event.wait(1)
