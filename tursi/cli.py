@@ -15,6 +15,7 @@ from rich import print as rprint
 from rich.table import Table
 from . import __version__
 from .engine import TursiEngine
+from datetime import datetime, timedelta
 
 # Create console for rich output
 console = Console()
