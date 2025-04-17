@@ -1,78 +1,222 @@
-name: Release
+name: Release Management
 
 on:
   push:
-    tags:
-      - 'v*.*.*'
+    branches: [ 'release/*' ]
+  pull_request:
+    types: [labeled]
+    branches: [ main ]
 
 permissions:
   contents: write
   packages: write
 
 jobs:
-  verify-and-release:
+  version-and-release:
+    if: "!startsWith(github.ref, 'refs/tags/')"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Poetry
+        uses: ./.github/workflows/poetry-setup
+        with:
+          python-version: '3.11'
+          poetry-version: '1.7.1'
+          install-root: true
+
+      - name: Install additional tools
+        run: poetry run pip install python-semantic-release
+
+      - name: Determine version type
+        id: version_type
+        run: |
+          echo "Event name: ${{ github.event_name }}"
+          echo "Branch ref: ${{ github.ref }}"
+
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "Processing as pull request"
+            if [[ "${{ github.event.label.name }}" == "major" ]]; then
+              echo "type=major" >> $GITHUB_OUTPUT
+            elif [[ "${{ github.event.label.name }}" == "minor" ]]; then
+              echo "type=minor" >> $GITHUB_OUTPUT
+            elif [[ "${{ github.event.label.name }}" == "alpha" ]]; then
+              echo "type=alpha" >> $GITHUB_OUTPUT
+            elif [[ "${{ github.event.label.name }}" == "beta" ]]; then
+              echo "type=beta" >> $GITHUB_OUTPUT
+            else
+              echo "type=patch" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "Processing as push event"
+            # Extract version using sed for better reliability
+            version=$(echo "${{ github.ref }}" | sed -n 's|^refs/heads/release/v\([0-9]\+\.[0-9]\+\.[0-9]\+\(-[a-z]\+\.[0-9]\+\)\?\)$|\1|p')
+            if [ -n "$version" ]; then
+              echo "Extracted version: $version"
+              echo "version=$version" >> $GITHUB_OUTPUT
+              echo "type=release" >> $GITHUB_OUTPUT
+            else
+              echo "Error: Branch name does not match expected format"
+              echo "Expected format: release/vX.Y.Z or release/vX.Y.Z-alpha.N"
+              echo "Got: ${{ github.ref }}"
+              exit 1
+            fi
+          fi
+
+      - name: Update version and changelog
+        run: |
+          # Function to validate version format
+          validate_version() {
+            if ! [[ $1 =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-z]+\.[0-9]+)?$ ]]; then
+              echo "Error: Invalid version format: $1"
+              echo "Expected format: X.Y.Z or X.Y.Z-alpha.N"
+              return 1
+            fi
+            return 0
+          }
+
+          if [[ "${{ steps.version_type.outputs.type }}" == "release" ]]; then
+            echo "Setting version to ${{ steps.version_type.outputs.version }}"
+            if ! validate_version "${{ steps.version_type.outputs.version }}"; then
+              exit 1
+            fi
+            poetry version "${{ steps.version_type.outputs.version }}"
+          else
+            echo "Updating version based on type: ${{ steps.version_type.outputs.type }}"
+            current_version=$(poetry version -s)
+            echo "Current version: $current_version"
+
+            if [[ "${{ steps.version_type.outputs.type }}" == "major" ]]; then
+              poetry version major
+            elif [[ "${{ steps.version_type.outputs.type }}" == "minor" ]]; then
+              poetry version minor
+            elif [[ "${{ steps.version_type.outputs.type }}" == "alpha" ]]; then
+              new_version="${current_version}-alpha.1"
+              if ! validate_version "$new_version"; then
+                exit 1
+              fi
+              poetry version "$new_version"
+            elif [[ "${{ steps.version_type.outputs.type }}" == "beta" ]]; then
+              new_version="${current_version}-beta.1"
+              if ! validate_version "$new_version"; then
+                exit 1
+              fi
+              poetry version "$new_version"
+            else
+              poetry version patch
+            fi
+          fi
+
+          new_version=$(poetry version -s)
+          echo "Updated to version: $new_version"
+          if ! validate_version "$new_version"; then
+            exit 1
+          fi
+
+          # Generate detailed changelog
+          echo "Generating changelog..."
+          if ! poetry run semantic-release changelog --unreleased > new_changes.md; then
+            echo "Error: Failed to generate changelog"
+            exit 1
+          fi
+
+          # Add version header
+          echo "# Version $new_version ($(date +%Y-%m-%d))" > version_changes.md
+          echo "" >> version_changes.md
+          cat new_changes.md >> version_changes.md
+
+          # Update main changelog
+          if [ -f CHANGELOG.md ]; then
+            cat version_changes.md CHANGELOG.md > temp_changelog.md
+            mv temp_changelog.md CHANGELOG.md
+          else
+            mv version_changes.md CHANGELOG.md
+          fi
+
+          echo "Changes to be committed:"
+          git diff
+
+      - name: Run tests
+        run: poetry run pytest
+
+      - name: Commit changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add pyproject.toml CHANGELOG.md
+          git commit -m "chore(release): bump version to $(poetry version -s)"
+
+          if [[ "${{ steps.version_type.outputs.type }}" == "release" ]]; then
+            echo "Pushing changes and creating tag..."
+            git push
+            git tag -a "v$(poetry version -s)" -m "v$(poetry version -s)"
+            git push --tags
+          else
+            echo "Not a release branch, skipping tag creation"
+            git push
+          fi
+
+  publish:
+    needs: version-and-release
+    if: |
+      success() &&
+      (startsWith(github.ref, 'refs/heads/release/') || startsWith(github.ref, 'refs/tags/v'))
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Extract version from tag
-        id: get_version
-        run: |
-          VERSION=${GITHUB_REF#refs/tags/v}
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "Preparing release for version $VERSION"
+      - name: Setup Poetry
+        uses: ./.github/workflows/poetry-setup
+        with:
+          python-version: '3.11'
+          poetry-version: '1.7.1'
+          install-root: true
 
       - name: Verify version consistency
         run: |
-          # Check pyproject.toml version
-          if ! grep -q "version = \"${{ steps.get_version.outputs.version }}\"" pyproject.toml; then
-            echo "Error: Version mismatch between tag (${{ steps.get_version.outputs.version }}) and pyproject.toml"
+          # Get version from pyproject.toml
+          PYPROJECT_VERSION=$(poetry version -s)
+          echo "pyproject.toml version: $PYPROJECT_VERSION"
+
+          # Get version from ref
+          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            REF_VERSION=${GITHUB_REF#refs/tags/v}
+          else
+            REF_VERSION=$(echo "${{ github.ref }}" | sed -n 's|^refs/heads/release/v\([0-9]\+\.[0-9]\+\.[0-9]\+\(-[a-z]\+\.[0-9]\+\)\?\)$|\1|p')
+          fi
+          echo "Ref version: $REF_VERSION"
+
+          # Verify versions match
+          if [ "$PYPROJECT_VERSION" != "$REF_VERSION" ]; then
+            echo "Error: Version mismatch between pyproject.toml ($PYPROJECT_VERSION) and git ref ($REF_VERSION)"
             exit 1
           fi
-
-          # Check CHANGELOG.md entry
-          if ! grep -q "\[${{ steps.get_version.outputs.version }}\]" CHANGELOG.md; then
-            echo "Error: No changelog entry found for version ${{ steps.get_version.outputs.version }}"
-            exit 1
-          fi
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.11"
-
-      - name: Install Poetry
-        uses: snok/install-poetry@v1
-        with:
-          version: 1.7.1
-          virtualenvs-create: true
-          virtualenvs-in-project: true
-
-      - name: Install dependencies
-        run: |
-          poetry install --no-interaction
-          poetry run pip install twine
-
-      - name: Run tests
-        run: poetry run pytest
-
-      - name: Clean dist directory
-        run: |
-          rm -rf dist/
-          mkdir -p dist/
 
       - name: Build package
         run: poetry build
 
       - name: Check distribution
         run: |
+          poetry run pip install twine
           poetry run twine check dist/*
 
+      - name: Verify tests pass
+        run: |
+          echo "Running final test verification before release..."
+          poetry run pytest
+          if [ $? -ne 0 ]; then
+            echo "Error: Tests failed in final verification"
+            exit 1
+          fi
+
       - name: Create GitHub Release
-        id: create_release
         uses: softprops/action-gh-release@v1
+        if: success()
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -81,12 +225,13 @@ jobs:
             dist/*.tar.gz
           draft: false
           prerelease: ${{ contains(github.ref, '-alpha.') || contains(github.ref, '-beta.') || contains(github.ref, '-rc.') }}
-          tag_name: ${{ github.ref_name }}
-          name: Release ${{ github.ref_name }}
+          tag_name: v${{ steps.get_version.outputs.version }}
+          name: Release v${{ steps.get_version.outputs.version }}
           body_path: .github/release-template.md
           generate_release_notes: true
 
       - name: Upload to PyPI
+        if: success()
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           password: ${{ secrets.PYPI_API_TOKEN }}

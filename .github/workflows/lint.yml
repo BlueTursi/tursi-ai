@@ -1,4 +1,5 @@
 name: Lint
+
 on:
   push:
     branches: [ main, 'release/*' ]
@@ -6,12 +7,14 @@ on:
       - '**.py'
       - 'pyproject.toml'
       - '.flake8'
+      - 'setup.cfg'
   pull_request:
     branches: [ main ]
     paths:
       - '**.py'
       - 'pyproject.toml'
       - '.flake8'
+      - 'setup.cfg'
 
 jobs:
   lint:
@@ -19,31 +22,28 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Setup Poetry
+        uses: ./.github/workflows/poetry-setup
         with:
-          python-version: "3.11"
-          cache: 'pip'
+          python-version: '3.11'
+          poetry-version: '1.7.1'
+          install-root: true
 
-      - name: Install Poetry
-        uses: snok/install-poetry@v1
-        with:
-          version: 1.7.1
-          virtualenvs-create: true
-          virtualenvs-in-project: true
+      - name: Install additional linting tools
+        run: |
+          poetry run pip install black isort mypy types-all
 
-      - name: Cache virtual environment
-        uses: actions/cache@v3
-        with:
-          path: .venv
-          key: ${{ runner.os }}-python-${{ hashFiles('**/poetry.lock') }}
+      - name: Run black
+        run: poetry run black --check tursi tests
 
-      - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: poetry install --no-interaction --no-root
-
-      - name: Install project
-        run: poetry install --no-interaction
+      - name: Run isort
+        run: poetry run isort --check-only tursi tests
 
       - name: Run flake8
         run: poetry run flake8 tursi tests
+
+      - name: Run mypy
+        run: poetry run mypy tursi tests
+
+      - name: Check import order
+        run: poetry run isort --check-only --diff tursi tests
