@@ -62,15 +62,15 @@ jobs:
           else
             poetry version patch
           fi
-          
+
           # Generate detailed changelog
           poetry run semantic-release changelog --unreleased > new_changes.md
-          
+
           # Add version header
           echo "# Version $(poetry version -s) ($(date +%Y-%m-%d))" > version_changes.md
           echo "" >> version_changes.md
           cat new_changes.md >> version_changes.md
-          
+
           # Update main changelog
           if [ -f CHANGELOG.md ]; then
             cat version_changes.md CHANGELOG.md > temp_changelog.md
@@ -78,15 +78,15 @@ jobs:
           else
             mv version_changes.md CHANGELOG.md
           fi
-          
+
           # Show the changes
           git diff
-          
+
           # Commit changes
           git add pyproject.toml CHANGELOG.md
           git commit -m "chore(release): bump version to $(poetry version -s)"
           git push origin HEAD:main
-          
+
           # Create and push tag with appropriate prefix
           git tag -a "${{ steps.version_type.outputs.tag_prefix }}$(poetry version -s)" -m "${{ steps.version_type.outputs.tag_prefix }}$(poetry version -s)"
-          git push origin "${{ steps.version_type.outputs.tag_prefix }}$(poetry version -s)" 
+          git push origin "${{ steps.version_type.outputs.tag_prefix }}$(poetry version -s)"

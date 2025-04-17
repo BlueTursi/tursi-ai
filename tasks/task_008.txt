@@ -1,0 +1,30 @@
+# Task ID: 8
+# Title: Add Rate Limiting Functionality
+# Status: done
+# Dependencies: 5
+# Priority: medium
+# Description: Implement rate limiting for model inference requests.
+# Details:
+Create a rate limiting system for inference requests. Support rate limit specifications like '100/minute' as shown in the PRD. Implement the rate limiting logic in the API server. Add command-line options to the 'tursi up' command for setting rate limits. Include proper error responses when limits are exceeded.
+
+# Test Strategy:
+Test rate limiting by sending requests at different rates. Verify requests are properly throttled and appropriate error messages are returned when limits are exceeded.
+
+# Subtasks:
+## 1. Implement core rate limiting logic [done]
+### Dependencies: None
+### Description: Create a rate limiting middleware/service that can track and enforce request limits
+### Details:
+Implement a rate limiting service that can track requests by user/client ID and enforce limits. Support rate limit specifications in the format of 'N/timeunit' (e.g., '100/minute'). Use a token bucket or sliding window algorithm for accurate tracking. The implementation should be able to handle different time units (second, minute, hour, day) and should be thread-safe. Include functionality to check if a request should be allowed and to record when requests are made.
+
+## 2. Integrate rate limiting with API server [done]
+### Dependencies: 8.1
+### Description: Connect the rate limiting logic to the API server's request handling pipeline
+### Details:
+Integrate the rate limiting service into the API server's middleware/request handling chain. Ensure that rate limiting is applied before model inference requests are processed. Add appropriate error handling to return 429 Too Many Requests responses with clear error messages and possibly Retry-After headers when limits are exceeded. The integration should be designed to have minimal performance impact on the request processing pipeline.
+
+## 3. Add CLI configuration for rate limits [done]
+### Dependencies: 8.2
+### Description: Extend the 'tursi up' command to accept and apply rate limiting configurations
+### Details:
+Extend the 'tursi up' command to accept rate limiting configurations through command-line options. Add parameters such as '--rate-limit' that accept values like '100/minute'. Update the configuration handling code to parse these options and pass them to the API server. Include validation for the rate limit format and provide helpful error messages for invalid inputs. Document the new command-line options in help text and user documentation.

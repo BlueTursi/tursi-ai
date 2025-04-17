@@ -52,4 +52,4 @@ jobs:
       run: poetry build
 
     - name: Test installed package
-      run: poetry run python -c "import tursi; print(tursi.__version__)" 
+      run: poetry run python -c "import tursi; print(tursi.__version__)"

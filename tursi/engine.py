@@ -13,7 +13,7 @@ import onnxruntime as ort
 
 class TursiEngine:
     """Main engine class for Tursi AI model deployment."""
-    
+
     def __init__(self):
         # Configure logging
         logging.basicConfig(level=logging.INFO)
@@ -66,7 +66,7 @@ class TursiEngine:
             config = AutoConfig.from_pretrained(model_name)
             # Check if model architecture is supported
             supported_architectures = ["DistilBert", "Bert", "RoBERTa", "GPT2"]
-            return any(arch.lower() in config.architectures[0].lower() 
+            return any(arch.lower() in config.architectures[0].lower()
                       for arch in supported_architectures)
         except Exception as e:
             self.logger.error(f"Error checking model compatibility: {str(e)}")
@@ -76,18 +76,18 @@ class TursiEngine:
         """Load a quantized model using ONNX Runtime."""
         try:
             self.logger.info(f"Loading quantized model: {model_name}...")
-            
+
             # Load tokenizer
             tokenizer = AutoTokenizer.from_pretrained(
                 model_name,
                 cache_dir=self.MODEL_CACHE_DIR
             )
-            
+
             # Configure ONNX Runtime session options
             session_options = ort.SessionOptions()
             session_options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
             session_options.intra_op_num_threads = 1
-            
+
             # Load model with quantization
             model = ORTModelForSequenceClassification.from_pretrained(
                 model_name,
@@ -95,13 +95,13 @@ class TursiEngine:
                 session_options=session_options,
                 cache_dir=self.MODEL_CACHE_DIR
             )
-            
+
             self.logger.info(
                 f"Model quantized successfully with {self.QUANTIZATION_MODE} "
                 f"{self.QUANTIZATION_BITS}-bit quantization!"
             )
             return model, tokenizer
-                
+
         except Exception as e:
             self.logger.error(f"Failed to load quantized model: {str(e)}")
             raise
@@ -121,7 +121,7 @@ class TursiEngine:
         """Create and configure the Flask application."""
         if rate_limit is None:
             rate_limit = self.RATE_LIMIT
-            
+
         try:
             # Validate model name
             if model_name not in self.ALLOWED_MODELS:
@@ -129,7 +129,7 @@ class TursiEngine:
 
             # Sanitize model name
             model_name = self.sanitize_model_name(model_name)
-            
+
             # Load model with quantization
             model, tokenizer = self.load_quantized_model(model_name)
             self.logger.info("Model loaded successfully!")
@@ -141,10 +141,10 @@ class TursiEngine:
             raise
 
         app = Flask(__name__)
-        
+
         # Store rate limit in app config
         app.config['RATE_LIMIT'] = rate_limit
-        
+
         # Initialize rate limiter
         limiter = Limiter(
             app=app,
@@ -180,15 +180,15 @@ class TursiEngine:
 
                 # Tokenize input
                 inputs = tokenizer(text, return_tensors="pt", padding=True, truncation=True)
-                
+
                 # Run inference
                 outputs = model(**inputs)
                 predictions = outputs.logits.softmax(dim=-1)
-                
+
                 # Get prediction
                 label = "POSITIVE" if predictions[0][1] > predictions[0][0] else "NEGATIVE"
                 score = float(predictions[0][1] if label == "POSITIVE" else predictions[0][0])
-                
+
                 return jsonify({"label": label, "score": score})
             except Exception as e:
                 self.logger.error(f"Error during prediction: {str(e)}")

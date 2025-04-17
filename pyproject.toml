@@ -1,15 +1,15 @@
 [tool.poetry]
 name = "tursi"
-version = "0.3.3"
+version = "0.3.0-alpha.1"
 description = "A simple framework to deploy AI models locally with one command, no containers needed"
 authors = ["Kresna Sucandra <kresnasucandra@gmail.com>"]
-readme = "README.md"
 license = "MIT"
+readme = "README.md"
+repository = "https://github.com/BlueTursi/tursi-ai"
 classifiers = [
     "License :: OSI Approved :: MIT License",
 ]
 packages = [{include = "tursi"}]
-repository = "https://github.com/BlueTursi/tursi-ai"
 
 [tool.poetry.dependencies]
 python = ">=3.11,<3.13"
@@ -22,6 +22,9 @@ optimum = "^1.17.0"
 accelerate = "^0.27.0"
 onnxruntime = "^1.17.0"
 onnx = "^1.15.0"
+typer = {extras = ["all"], version = "^0.9.0"}
+rich = "^13.0.0"
+psutil = "^5.9.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"
@@ -32,8 +35,10 @@ build = "^1.0.3"
 twine = "^4.0.2"
 
 [tool.poetry.scripts]
+tursi = "tursi.cli:main"
 tursi-engine = "tursi.engine:main"
 tursi-test = "tursi.test:main"
+tursid = "tursi.daemon:main"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -41,7 +46,8 @@ python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
 addopts = "-v --cov=tursi --cov-report=term-missing"
+ini_file = "tests/pytest.ini"
 
 [build-system]
 requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api" 
+build-backend = "poetry.core.masonry.api"

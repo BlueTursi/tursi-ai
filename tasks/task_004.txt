@@ -1,0 +1,50 @@
+# Task ID: 4
+# Title: Implement Basic CLI Commands
+# Status: done
+# Dependencies: 3
+# Priority: high
+# Description: Create the core CLI (tursi) with the basic commands: up, down, ps, logs.
+# Details:
+Implement the CLI interface using argparse or click. Create the basic commands: 'tursi up', 'tursi down', 'tursi ps', and 'tursi logs' that communicate with the API server. Implement command-line argument parsing, help text, and error handling. Ensure the commands follow the syntax specified in the PRD.
+
+# Test Strategy:
+Write CLI tests that mock the API responses and verify the commands parse arguments correctly and display output properly. Test both success and error scenarios.
+
+# Subtasks:
+## 1. Set up CLI framework with command structure [done]
+### Dependencies: None
+### Description: Create the basic CLI framework using click library and set up the command structure for the tursi command
+### Details:
+1. Install click library for command-line interface creation
+2. Create a new module for the CLI implementation
+3. Set up the main entry point function with @click.group() decorator
+4. Define the command structure for 'up', 'down', 'ps', and 'logs' commands
+5. Implement help text and basic argument structure for each command
+6. Set up proper error handling for invalid commands
+7. Create a setup.py file to make the CLI installable via pip
+
+## 2. Implement API client for CLI commands [done]
+### Dependencies: 4.1
+### Description: Create an API client module that will handle communication between CLI commands and the API server
+### Details:
+1. Create an APIClient class to handle HTTP requests to the API server
+2. Implement methods for each API endpoint corresponding to CLI commands
+3. Add proper error handling for API connection issues
+4. Implement authentication if required
+5. Create methods for formatting API responses for CLI output
+6. Add configuration handling for API server URL and other settings
+7. Implement timeout and retry logic for robustness
+
+## 3. Connect CLI commands to API client and implement output formatting [done]
+### Dependencies: 4.1, 4.2
+### Description: Connect the CLI command implementations to the API client and implement proper output formatting for each command
+### Details:
+1. Complete the implementation of 'tursi up' command to start containers via API
+2. Complete the implementation of 'tursi down' command to stop containers via API
+3. Complete the implementation of 'tursi ps' command to list running containers via API
+4. Complete the implementation of 'tursi logs' command to fetch and display container logs via API
+5. Implement proper output formatting for each command (tables for ps, streaming for logs, etc.)
+6. Add progress indicators for long-running operations
+7. Implement proper exit codes based on command success/failure
+8. Add verbose mode for debugging
+9. Test all commands end-to-end

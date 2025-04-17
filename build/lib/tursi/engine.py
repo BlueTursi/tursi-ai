@@ -80,7 +80,7 @@ def main():
         # Start server in a new process
         p = Process(target=run_server, args=(args.model, args.host, args.port))
         p.start()
-        
+
         # Save PID immediately
         with open(PID_FILE, "w") as f:
             f.write(str(p.pid))
@@ -89,7 +89,7 @@ def main():
             print("Server failed to start. Check logs for details.")
             os.remove(PID_FILE)
             sys.exit(1)
-        
+
         print(f"Server started with PID {p.pid}. Use 'tursi-engine down' to stop.")
         sys.exit(0)
 
@@ -97,10 +97,10 @@ def main():
         if not os.path.exists(PID_FILE):
             print("No server running (PID file not found).")
             sys.exit(1)
-        
+
         with open(PID_FILE, "r") as f:
             pid = int(f.read().strip())
-        
+
         if is_server_running(pid):
             try:
                 os.kill(pid, signal.SIGTERM)
@@ -116,7 +116,7 @@ def main():
                 sys.exit(1)
         else:
             print("Server process not found. Cleaning up PID file.")
-        
+
         os.remove(PID_FILE)
 
 if __name__ == "__main__":

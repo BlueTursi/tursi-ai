@@ -1,0 +1,30 @@
+# Task ID: 3
+# Title: Develop API Server for Client-Daemon Communication
+# Status: done
+# Dependencies: 2
+# Priority: high
+# Description: Create the API server that will handle communication between the CLI client and the daemon.
+# Details:
+Implement a Flask-based API server within the daemon process. Create endpoints for model deployment, status checking, stopping models, and retrieving logs. Implement proper error handling and status codes. Ensure the API is RESTful and follows best practices.
+
+# Test Strategy:
+Write API tests using pytest to verify each endpoint functions correctly. Test error conditions and edge cases like attempting to deploy an already running model.
+
+# Subtasks:
+## 1. Set up basic Flask API server structure within daemon [done]
+### Dependencies: None
+### Description: Create the foundational Flask server structure that will run within the daemon process and handle client-daemon communication.
+### Details:
+Implement a Flask application integrated with the daemon process. Create a basic server structure with configuration for routes, error handling, and logging. Set up proper initialization and shutdown procedures. Configure the server to listen on an appropriate port (consider using a configurable port with a sensible default like 8000). Implement middleware for request validation and authentication if required. Ensure the server can be started and stopped alongside the daemon process.
+
+## 2. Implement core API endpoints for model management [done]
+### Dependencies: 3.1
+### Description: Create the essential RESTful API endpoints that handle model deployment, status checking, and stopping models.
+### Details:
+Design and implement RESTful endpoints following best practices. Create endpoints for: 1) Model deployment (POST /models) - accepting model parameters and configuration; 2) Status checking (GET /models/{id}) - returning current model status, metrics, and configuration; 3) Stopping models (DELETE /models/{id}) - gracefully terminating a running model. Implement proper request validation, response formatting, and appropriate HTTP status codes. Document the API schema using OpenAPI/Swagger. Ensure each endpoint properly interacts with the daemon's core functionality for managing models.
+
+## 3. Add logging endpoints and enhance error handling [done]
+### Dependencies: 3.2
+### Description: Implement endpoints for retrieving logs and enhance the API's error handling capabilities.
+### Details:
+Create endpoints for retrieving logs (GET /models/{id}/logs) with options for filtering by time range, log level, and pagination. Implement a global error handling mechanism that catches exceptions and returns appropriate error responses with meaningful messages. Define custom error classes for different types of failures (e.g., ModelNotFoundError, DeploymentError). Ensure all endpoints return consistent error formats with appropriate HTTP status codes (400 for client errors, 500 for server errors, etc.). Add request/response logging for debugging purposes. Implement rate limiting and other security measures to protect the API from abuse.

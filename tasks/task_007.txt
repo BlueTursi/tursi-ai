@@ -1,0 +1,30 @@
+# Task ID: 7
+# Title: Implement Model Quantization Features
+# Status: done
+# Dependencies: 5
+# Priority: medium
+# Description: Add support for 4-bit and 8-bit model quantization.
+# Details:
+Implement static and dynamic quantization options using PyTorch's quantization features. Support both 4-bit and 8-bit precision as specified in the PRD. Add command-line options to the 'tursi up' command for controlling quantization. Ensure compatibility checking for models that support quantization.
+
+# Test Strategy:
+Test quantization with compatible models. Measure and compare memory usage and inference speed between quantized and non-quantized versions. Test error handling for incompatible models.
+
+# Subtasks:
+## 1. Implement core quantization module [done]
+### Dependencies: None
+### Description: Create a core module that handles 4-bit and 8-bit model quantization using PyTorch's quantization features
+### Details:
+Develop a quantization module that implements both static and dynamic quantization for 4-bit and 8-bit precision. This module should: 1) Define functions for quantizing model weights and activations, 2) Include methods to determine if a model supports quantization, 3) Implement the core quantization logic using PyTorch's quantization APIs, 4) Handle the conversion between full precision and quantized models, 5) Include appropriate error handling for unsupported models or operations.
+
+## 2. Add CLI options for quantization control [done]
+### Dependencies: 7.1
+### Description: Extend the 'tursi up' command to include options for controlling model quantization
+### Details:
+Modify the command-line interface to support quantization options: 1) Add flags for enabling quantization (--quantize), 2) Add parameters for specifying precision (--precision with values '4bit' or '8bit'), 3) Add option for selecting quantization type (--quantization-type with values 'static' or 'dynamic'), 4) Update help documentation to explain these new options, 5) Implement argument validation to ensure valid combinations of quantization parameters.
+
+## 3. Implement model compatibility checking and integration [done]
+### Dependencies: 7.1, 7.2
+### Description: Add compatibility checking for quantization and integrate quantization into the model loading pipeline
+### Details:
+Integrate quantization into the model loading workflow: 1) Implement a compatibility checking system that verifies if a specific model supports the requested quantization method and precision, 2) Add appropriate warning/error messages for incompatible configurations, 3) Modify the model loading process to apply quantization based on user settings, 4) Add logging for quantization operations, including memory savings information, 5) Add unit and integration tests to verify quantization works correctly across supported models, 6) Update documentation to reflect quantization capabilities and limitations.

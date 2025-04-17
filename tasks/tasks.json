@@ -1,138 +1,446 @@
 {
-    "project": "Tursi AI",
-    "version": "0.3.1",
-    "tasks": [
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Setup Project Structure",
+      "description": "Create the initial project structure including the main directories and basic configuration files.",
+      "status": "done",
+      "dependencies": [],
+      "priority": "high",
+      "details": "Create the directory structure as specified in the PRD: tursi/ with subdirectories for cli/, daemon/, api/, and utils/. Initialize a Git repository, create a requirements.txt file with Python 3.11+ dependencies including Flask, Transformers, and PyTorch. Set up basic configuration files including setup.py for packaging.",
+      "testStrategy": "Verify all directories exist and can be imported as modules. Ensure the project can be installed in development mode with pip install -e .",
+      "subtasks": [
         {
-            "id": 1,
-            "title": "Model Deployment Core",
-            "description": "Implement one-command deployment system for AI models",
-            "priority": "high",
-            "status": "todo",
-            "subtasks": [
-                "Create deployment command interface",
-                "Implement model loading system",
-                "Add support for various model types",
-                "Create API server setup"
-            ]
+          "id": 1,
+          "title": "Create directory structure and initialize Git repository",
+          "description": "Set up the basic project directory structure and initialize version control",
+          "status": "done",
+          "dependencies": [],
+          "details": "Create the main tursi/ directory and its subdirectories (cli/, daemon/, api/, and utils/). Add empty __init__.py files in each directory to make them proper Python packages. Initialize a Git repository in the root directory with 'git init'. Create a basic .gitignore file that includes common Python patterns (like __pycache__/, *.pyc, etc.), virtual environments, and IDE-specific files."
         },
         {
-            "id": 2,
-            "title": "Model Optimization",
-            "description": "Implement quantization features for model optimization",
-            "priority": "high",
-            "status": "todo",
-            "subtasks": [
-                "Add dynamic quantization support",
-                "Implement static quantization",
-                "Create 4-bit quantization option",
-                "Add 8-bit quantization option",
-                "Optimize for CPU inference"
-            ]
+          "id": 2,
+          "title": "Create dependency and requirements files",
+          "description": "Set up requirements.txt with all project dependencies and version constraints",
+          "status": "done",
+          "dependencies": [
+            1
+          ],
+          "details": "Create a requirements.txt file in the project root listing all dependencies with version specifications. Include Flask (for API), Transformers and PyTorch (as specified), plus any utility libraries needed. Consider separating development dependencies (like pytest, black, flake8) from runtime dependencies. Ensure Python 3.11+ compatibility is noted in the file header."
         },
         {
-            "id": 3,
-            "title": "API Development",
-            "description": "Develop RESTful API interface with security features",
-            "priority": "high",
-            "status": "todo",
-            "subtasks": [
-                "Implement /predict endpoint",
-                "Add rate limiting",
-                "Create input validation",
-                "Implement error handling",
-                "Add secure model loading"
-            ]
-        },
-        {
-            "id": 4,
-            "title": "Testing Infrastructure",
-            "description": "Set up comprehensive testing framework",
-            "priority": "medium",
-            "status": "todo",
-            "subtasks": [
-                "Create test suite",
-                "Implement automated testing",
-                "Set up CI/CD pipeline",
-                "Add test coverage reporting"
-            ]
-        },
-        {
-            "id": 5,
-            "title": "Documentation",
-            "description": "Create comprehensive documentation",
-            "priority": "medium",
-            "status": "todo",
-            "subtasks": [
-                "Write API documentation",
-                "Create usage examples",
-                "Add configuration guide",
-                "Document quantization options"
-            ]
-        },
-        {
-            "id": 6,
-            "title": "Performance Optimization",
-            "description": "Optimize system performance",
-            "priority": "medium",
-            "status": "todo",
-            "subtasks": [
-                "Optimize memory usage",
-                "Improve inference speed",
-                "Enhance API scalability",
-                "Implement caching"
-            ]
-        },
-        {
-            "id": 7,
-            "title": "Security Enhancements",
-            "description": "Implement security features",
-            "priority": "high",
-            "status": "todo",
-            "subtasks": [
-                "Add input validation",
-                "Implement rate limiting",
-                "Secure model loading",
-                "Sanitize error messages"
-            ]
-        },
-        {
-            "id": 8,
-            "title": "Configuration System",
-            "description": "Create flexible configuration system",
-            "priority": "medium",
-            "status": "todo",
-            "subtasks": [
-                "Implement environment variables",
-                "Add configuration file support",
-                "Create default settings",
-                "Add validation for settings"
-            ]
-        },
-        {
-            "id": 9,
-            "title": "Monitoring and Logging",
-            "description": "Add system monitoring and logging",
-            "priority": "low",
-            "status": "todo",
-            "subtasks": [
-                "Implement logging system",
-                "Add performance metrics",
-                "Create monitoring dashboard",
-                "Set up alerts"
-            ]
-        },
-        {
-            "id": 10,
-            "title": "Future Enhancements Planning",
-            "description": "Plan for future features",
-            "priority": "low",
-            "status": "todo",
-            "subtasks": [
-                "Research GPU acceleration",
-                "Plan additional model formats",
-                "Design enhanced quantization",
-                "Plan extended API features"
-            ]
+          "id": 3,
+          "title": "Set up packaging and configuration files",
+          "description": "Create setup.py and basic configuration files for the project",
+          "status": "done",
+          "dependencies": [
+            1,
+            2
+          ],
+          "details": "Create a setup.py file in the project root with package metadata, entry points for CLI tools, and dependency information synced with requirements.txt. Add a README.md with basic project description and setup instructions. Create a config/ directory with template configuration files for different environments (development, testing, production). Include a basic logging configuration file. Add placeholder main.py files in the cli/, daemon/, and api/ directories to establish entry points."
         }
-    ]
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Implement Core Daemon Process (tursid)",
+      "description": "Create the daemon process (tursid) that will manage model deployments and resources.",
+      "status": "done",
+      "dependencies": [
+        1
+      ],
+      "priority": "high",
+      "details": "Implement the daemon process in Python that runs as a background service. Include functionality for starting/stopping, handling signals, and maintaining state. Create a SQLite database schema for storing model deployment information. Implement basic process management for starting and stopping model inference processes.",
+      "testStrategy": "Write unit tests to verify the daemon can start, stop, and maintain state. Test process management functions with mock model processes.",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Implement daemon process framework with signal handling",
+          "description": "Create the basic Python daemon process structure that can run in the background, respond to system signals, and maintain state",
+          "status": "done",
+          "dependencies": [],
+          "details": "Implement a Python class that handles daemonization using standard libraries like 'daemon' or built-in methods. Include proper handling for SIGTERM, SIGINT, and SIGHUP signals. Implement logging capabilities. Create configuration handling for daemon settings. Ensure the daemon can properly fork, detach from terminal, and run in the background. Include proper PID file management and implement graceful startup/shutdown procedures."
+        },
+        {
+          "id": 2,
+          "title": "Design and implement SQLite database schema for model deployment",
+          "description": "Create a SQLite database schema and interface for storing and retrieving model deployment information",
+          "status": "done",
+          "dependencies": [
+            1
+          ],
+          "details": "Design a database schema with tables for: 1) model metadata (name, version, path, etc.), 2) deployment configurations, 3) runtime statistics. Implement SQLAlchemy ORM models or a similar abstraction layer for database interactions. Create database migration scripts for version control. Implement CRUD operations for model deployments. Add methods to query deployment status and history. Include transaction support for maintaining data integrity. Design the schema to be extensible for future features."
+        },
+        {
+          "id": 3,
+          "title": "Implement model inference process management",
+          "description": "Create functionality to start, monitor, and stop model inference processes",
+          "status": "done",
+          "dependencies": [
+            1,
+            2
+          ],
+          "details": "Implement process management using libraries like 'subprocess' or 'multiprocessing'. Create methods to spawn child processes for model inference. Implement health checking and monitoring of running inference processes. Add resource management to control CPU/memory usage. Create an API for other components to request process operations. Implement process isolation for security. Add error handling and automatic recovery for crashed processes. Ensure proper cleanup of resources when processes terminate. Implement status reporting that updates the database schema created in subtask 2."
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Develop API Server for Client-Daemon Communication",
+      "description": "Create the API server that will handle communication between the CLI client and the daemon.",
+      "status": "done",
+      "dependencies": [
+        2
+      ],
+      "priority": "high",
+      "details": "Implement a Flask-based API server within the daemon process. Create endpoints for model deployment, status checking, stopping models, and retrieving logs. Implement proper error handling and status codes. Ensure the API is RESTful and follows best practices.",
+      "testStrategy": "Write API tests using pytest to verify each endpoint functions correctly. Test error conditions and edge cases like attempting to deploy an already running model.",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Set up basic Flask API server structure within daemon",
+          "description": "Create the foundational Flask server structure that will run within the daemon process and handle client-daemon communication.",
+          "status": "done",
+          "dependencies": [],
+          "details": "Implement a Flask application integrated with the daemon process. Create a basic server structure with configuration for routes, error handling, and logging. Set up proper initialization and shutdown procedures. Configure the server to listen on an appropriate port (consider using a configurable port with a sensible default like 8000). Implement middleware for request validation and authentication if required. Ensure the server can be started and stopped alongside the daemon process."
+        },
+        {
+          "id": 2,
+          "title": "Implement core API endpoints for model management",
+          "description": "Create the essential RESTful API endpoints that handle model deployment, status checking, and stopping models.",
+          "status": "done",
+          "dependencies": [
+            1
+          ],
+          "details": "Design and implement RESTful endpoints following best practices. Create endpoints for: 1) Model deployment (POST /models) - accepting model parameters and configuration; 2) Status checking (GET /models/{id}) - returning current model status, metrics, and configuration; 3) Stopping models (DELETE /models/{id}) - gracefully terminating a running model. Implement proper request validation, response formatting, and appropriate HTTP status codes. Document the API schema using OpenAPI/Swagger. Ensure each endpoint properly interacts with the daemon's core functionality for managing models."
+        },
+        {
+          "id": 3,
+          "title": "Add logging endpoints and enhance error handling",
+          "description": "Implement endpoints for retrieving logs and enhance the API's error handling capabilities.",
+          "status": "done",
+          "dependencies": [
+            2
+          ],
+          "details": "Create endpoints for retrieving logs (GET /models/{id}/logs) with options for filtering by time range, log level, and pagination. Implement a global error handling mechanism that catches exceptions and returns appropriate error responses with meaningful messages. Define custom error classes for different types of failures (e.g., ModelNotFoundError, DeploymentError). Ensure all endpoints return consistent error formats with appropriate HTTP status codes (400 for client errors, 500 for server errors, etc.). Add request/response logging for debugging purposes. Implement rate limiting and other security measures to protect the API from abuse."
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Implement Basic CLI Commands",
+      "description": "Create the core CLI (tursi) with the basic commands: up, down, ps, logs.",
+      "status": "done",
+      "dependencies": [
+        3
+      ],
+      "priority": "high",
+      "details": "Implement the CLI interface using argparse or click. Create the basic commands: 'tursi up', 'tursi down', 'tursi ps', and 'tursi logs' that communicate with the API server. Implement command-line argument parsing, help text, and error handling. Ensure the commands follow the syntax specified in the PRD.",
+      "testStrategy": "Write CLI tests that mock the API responses and verify the commands parse arguments correctly and display output properly. Test both success and error scenarios.",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Set up CLI framework with command structure",
+          "description": "Create the basic CLI framework using click library and set up the command structure for the tursi command",
+          "status": "done",
+          "dependencies": [],
+          "details": "1. Install click library for command-line interface creation\n2. Create a new module for the CLI implementation\n3. Set up the main entry point function with @click.group() decorator\n4. Define the command structure for 'up', 'down', 'ps', and 'logs' commands\n5. Implement help text and basic argument structure for each command\n6. Set up proper error handling for invalid commands\n7. Create a setup.py file to make the CLI installable via pip"
+        },
+        {
+          "id": 2,
+          "title": "Implement API client for CLI commands",
+          "description": "Create an API client module that will handle communication between CLI commands and the API server",
+          "status": "done",
+          "dependencies": [
+            1
+          ],
+          "details": "1. Create an APIClient class to handle HTTP requests to the API server\n2. Implement methods for each API endpoint corresponding to CLI commands\n3. Add proper error handling for API connection issues\n4. Implement authentication if required\n5. Create methods for formatting API responses for CLI output\n6. Add configuration handling for API server URL and other settings\n7. Implement timeout and retry logic for robustness"
+        },
+        {
+          "id": 3,
+          "title": "Connect CLI commands to API client and implement output formatting",
+          "description": "Connect the CLI command implementations to the API client and implement proper output formatting for each command",
+          "status": "done",
+          "dependencies": [
+            1,
+            2
+          ],
+          "details": "1. Complete the implementation of 'tursi up' command to start containers via API\n2. Complete the implementation of 'tursi down' command to stop containers via API\n3. Complete the implementation of 'tursi ps' command to list running containers via API\n4. Complete the implementation of 'tursi logs' command to fetch and display container logs via API\n5. Implement proper output formatting for each command (tables for ps, streaming for logs, etc.)\n6. Add progress indicators for long-running operations\n7. Implement proper exit codes based on command success/failure\n8. Add verbose mode for debugging\n9. Test all commands end-to-end"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Implement Model Deployment Logic",
+      "description": "Create the core functionality to deploy and run AI models.",
+      "status": "in-progress",
+      "dependencies": [
+        2,
+        3
+      ],
+      "priority": "high",
+      "details": "Implement the model deployment logic in the daemon. Use the Transformers library to load models from Hugging Face. Create a model manager class that handles loading models into memory, starting inference servers, and managing their lifecycle. Implement proper cleanup on shutdown. Support the basic model deployment flow as specified in the PRD.",
+      "testStrategy": "Test with small models like distilbert-base-uncased. Verify models can be loaded, run, and stopped correctly. Test memory usage and cleanup to ensure no leaks.",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Create ModelManager class structure",
+          "description": "Implement the basic ModelManager class that will be responsible for model lifecycle management",
+          "status": "pending",
+          "dependencies": [],
+          "details": "Create a ModelManager class with the following components: 1) Constructor that initializes necessary data structures for tracking loaded models and running inference servers, 2) Methods for model registration and validation, 3) Configuration handling for model parameters, 4) Error handling and logging infrastructure, 5) Interface methods that will be called by the daemon. Include documentation for each method and proper type hints. This class should follow a singleton pattern to ensure only one instance manages all models."
+        },
+        {
+          "id": 2,
+          "title": "Implement model loading functionality",
+          "description": "Add methods to load models from Hugging Face using the Transformers library",
+          "status": "pending",
+          "dependencies": [
+            1
+          ],
+          "details": "Extend the ModelManager to implement model loading functionality: 1) Create methods to download and cache models from Hugging Face, 2) Implement model loading with appropriate device placement (CPU/GPU/TPU), 3) Add support for different model types and architectures, 4) Implement memory management to handle model loading constraints, 5) Add progress tracking and error handling for the loading process. Use the Transformers library's pipeline and model loading capabilities, with appropriate handling of model configurations."
+        },
+        {
+          "id": 3,
+          "title": "Implement inference server management and lifecycle hooks",
+          "description": "Add functionality to start, monitor, and shut down inference servers for loaded models",
+          "status": "pending",
+          "dependencies": [
+            2
+          ],
+          "details": "Complete the ModelManager by implementing: 1) Methods to start inference servers for loaded models, 2) Health monitoring and status reporting for running servers, 3) Resource management to optimize performance, 4) Graceful shutdown procedures to ensure proper cleanup, 5) API endpoints for the daemon to interact with running models, 6) Implementation of the model deployment flow as specified in the PRD. Include proper exception handling for server failures and implement appropriate retry logic. Ensure that the lifecycle hooks properly clean up resources when models are unloaded or when the daemon shuts down."
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Add Resource Monitoring and Statistics",
+      "description": "Implement the 'tursi stats' command and underlying monitoring functionality.",
+      "status": "pending",
+      "dependencies": [
+        4,
+        5
+      ],
+      "priority": "medium",
+      "details": "Create resource monitoring in the daemon to track CPU, memory, and GPU usage of deployed models. Implement the 'tursi stats' command in the CLI to display this information. Add real-time monitoring capabilities and historical data collection in SQLite. Create visualizations for the command-line output.",
+      "testStrategy": "Test monitoring accuracy by comparing with system tools like top or nvidia-smi. Verify stats command displays information correctly and handles different terminal sizes.",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Implement Core Resource Monitoring in Daemon",
+          "description": "Create the foundational monitoring system in the daemon to track CPU, memory, and GPU usage of deployed models.",
+          "status": "pending",
+          "dependencies": [],
+          "details": "Develop a monitoring module in the daemon that periodically collects resource usage metrics. Use psutil for CPU and memory monitoring, and appropriate GPU libraries (like pynvml for NVIDIA GPUs) to track GPU utilization. Implement a data collection scheduler that samples metrics at regular intervals (e.g., every 5 seconds). Store the collected data in memory with a time-based rolling window for immediate access. Create a simple API endpoint in the daemon that returns the current resource usage data when queried."
+        },
+        {
+          "id": 2,
+          "title": "Implement Data Persistence and Historical Tracking",
+          "description": "Create a SQLite database schema and persistence layer to store historical resource usage data for long-term analysis.",
+          "status": "pending",
+          "dependencies": [
+            1
+          ],
+          "details": "Design and implement a SQLite database schema to store time-series resource metrics. Include tables for system-wide metrics and per-model metrics with appropriate timestamps and identifiers. Create a data persistence service that periodically writes the in-memory metrics to the database. Implement data retention policies to prevent unlimited database growth (e.g., aggregate older data into hourly/daily summaries). Add query functions to retrieve historical data with filtering capabilities by time range and model ID."
+        },
+        {
+          "id": 3,
+          "title": "Implement CLI Stats Command with Visualizations",
+          "description": "Create the 'tursi stats' command in the CLI with options for displaying current and historical resource usage with visualizations.",
+          "status": "pending",
+          "dependencies": [
+            1,
+            2
+          ],
+          "details": "Implement the 'tursi stats' command with various subcommands and options: 'tursi stats current' for real-time monitoring, 'tursi stats history' for historical data, and model-specific filtering with '--model <model_id>'. Use libraries like rich or termgraph to create visually appealing terminal-based charts and tables. Implement real-time updating display for the 'current' option with refresh intervals. For historical data, create visualizations like bar charts, line graphs for time series, and summary statistics. Include options for exporting data to CSV or JSON formats. Add documentation and help text for all command options."
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "Implement Model Quantization Features",
+      "description": "Add support for 4-bit and 8-bit model quantization.",
+      "status": "done",
+      "dependencies": [
+        5
+      ],
+      "priority": "medium",
+      "details": "Implement static and dynamic quantization options using PyTorch's quantization features. Support both 4-bit and 8-bit precision as specified in the PRD. Add command-line options to the 'tursi up' command for controlling quantization. Ensure compatibility checking for models that support quantization.",
+      "testStrategy": "Test quantization with compatible models. Measure and compare memory usage and inference speed between quantized and non-quantized versions. Test error handling for incompatible models.",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Implement core quantization module",
+          "description": "Create a core module that handles 4-bit and 8-bit model quantization using PyTorch's quantization features",
+          "status": "done",
+          "dependencies": [],
+          "details": "Develop a quantization module that implements both static and dynamic quantization for 4-bit and 8-bit precision. This module should: 1) Define functions for quantizing model weights and activations, 2) Include methods to determine if a model supports quantization, 3) Implement the core quantization logic using PyTorch's quantization APIs, 4) Handle the conversion between full precision and quantized models, 5) Include appropriate error handling for unsupported models or operations."
+        },
+        {
+          "id": 2,
+          "title": "Add CLI options for quantization control",
+          "description": "Extend the 'tursi up' command to include options for controlling model quantization",
+          "status": "done",
+          "dependencies": [
+            1
+          ],
+          "details": "Modify the command-line interface to support quantization options: 1) Add flags for enabling quantization (--quantize), 2) Add parameters for specifying precision (--precision with values '4bit' or '8bit'), 3) Add option for selecting quantization type (--quantization-type with values 'static' or 'dynamic'), 4) Update help documentation to explain these new options, 5) Implement argument validation to ensure valid combinations of quantization parameters."
+        },
+        {
+          "id": 3,
+          "title": "Implement model compatibility checking and integration",
+          "description": "Add compatibility checking for quantization and integrate quantization into the model loading pipeline",
+          "status": "done",
+          "dependencies": [
+            1,
+            2
+          ],
+          "details": "Integrate quantization into the model loading workflow: 1) Implement a compatibility checking system that verifies if a specific model supports the requested quantization method and precision, 2) Add appropriate warning/error messages for incompatible configurations, 3) Modify the model loading process to apply quantization based on user settings, 4) Add logging for quantization operations, including memory savings information, 5) Add unit and integration tests to verify quantization works correctly across supported models, 6) Update documentation to reflect quantization capabilities and limitations."
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "title": "Add Rate Limiting Functionality",
+      "description": "Implement rate limiting for model inference requests.",
+      "status": "done",
+      "dependencies": [
+        5
+      ],
+      "priority": "medium",
+      "details": "Create a rate limiting system for inference requests. Support rate limit specifications like '100/minute' as shown in the PRD. Implement the rate limiting logic in the API server. Add command-line options to the 'tursi up' command for setting rate limits. Include proper error responses when limits are exceeded.",
+      "testStrategy": "Test rate limiting by sending requests at different rates. Verify requests are properly throttled and appropriate error messages are returned when limits are exceeded.",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Implement core rate limiting logic",
+          "description": "Create a rate limiting middleware/service that can track and enforce request limits",
+          "status": "done",
+          "dependencies": [],
+          "details": "Implement a rate limiting service that can track requests by user/client ID and enforce limits. Support rate limit specifications in the format of 'N/timeunit' (e.g., '100/minute'). Use a token bucket or sliding window algorithm for accurate tracking. The implementation should be able to handle different time units (second, minute, hour, day) and should be thread-safe. Include functionality to check if a request should be allowed and to record when requests are made."
+        },
+        {
+          "id": 2,
+          "title": "Integrate rate limiting with API server",
+          "description": "Connect the rate limiting logic to the API server's request handling pipeline",
+          "status": "done",
+          "dependencies": [
+            1
+          ],
+          "details": "Integrate the rate limiting service into the API server's middleware/request handling chain. Ensure that rate limiting is applied before model inference requests are processed. Add appropriate error handling to return 429 Too Many Requests responses with clear error messages and possibly Retry-After headers when limits are exceeded. The integration should be designed to have minimal performance impact on the request processing pipeline."
+        },
+        {
+          "id": 3,
+          "title": "Add CLI configuration for rate limits",
+          "description": "Extend the 'tursi up' command to accept and apply rate limiting configurations",
+          "status": "done",
+          "dependencies": [
+            2
+          ],
+          "details": "Extend the 'tursi up' command to accept rate limiting configurations through command-line options. Add parameters such as '--rate-limit' that accept values like '100/minute'. Update the configuration handling code to parse these options and pass them to the API server. Include validation for the rate limit format and provide helpful error messages for invalid inputs. Document the new command-line options in help text and user documentation."
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "title": "Implement Health Checks and Error Handling",
+      "description": "Add health check functionality and improve error handling across the system.",
+      "status": "done",
+      "dependencies": [
+        3,
+        5
+      ],
+      "priority": "low",
+      "details": "Implement health check endpoints in the API server. Create automatic recovery mechanisms for models that crash. Improve error handling throughout the system with detailed error messages and logging. Add connectivity checks between CLI and daemon. Implement proper shutdown procedures for unexpected terminations.",
+      "testStrategy": "Test health checks by simulating various failure scenarios. Verify the system can recover from crashes. Test error messages are clear and helpful.",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Implement API Server Health Checks and Logging",
+          "description": "Add health check endpoints to the API server and implement comprehensive logging for error tracking",
+          "status": "done",
+          "dependencies": [],
+          "details": "Create a '/health' endpoint in the API server that checks and reports on system components status (database connectivity, model availability, etc.). Implement structured logging throughout the API server with different severity levels (info, warning, error, fatal). Add unique error codes and detailed error messages for all API responses. Set up log rotation and persistence. Ensure all API errors are properly caught, logged, and return appropriate HTTP status codes with descriptive messages."
+        },
+        {
+          "id": 2,
+          "title": "Implement Model Recovery and CLI-Daemon Connectivity Checks",
+          "description": "Create automatic recovery mechanisms for crashed models and implement connectivity verification between CLI and daemon",
+          "status": "done",
+          "dependencies": [
+            1
+          ],
+          "details": "Develop a watchdog system that monitors model processes and automatically restarts them if they crash. Implement graceful degradation when models are unavailable. Add health status reporting from models to the central health check system. For CLI-daemon communication, implement a heartbeat mechanism to verify connectivity. Add automatic reconnection logic in the CLI when the daemon connection is lost. Create clear error messaging for connection issues that guides users on troubleshooting steps."
+        },
+        {
+          "id": 3,
+          "title": "Implement Graceful Shutdown and System-wide Error Handling",
+          "description": "Add proper shutdown procedures for unexpected terminations and implement consistent error handling across all system components",
+          "status": "done",
+          "dependencies": [
+            1,
+            2
+          ],
+          "details": "Implement signal handlers (SIGTERM, SIGINT) in all components to ensure graceful shutdown. Create cleanup procedures that properly close connections, save state, and terminate child processes. Develop a system-wide error handling strategy with standardized error types and handling patterns. Implement circuit breakers for external dependencies to prevent cascading failures. Add global exception handlers as a last resort for unexpected errors. Create a comprehensive system health dashboard that aggregates health information from all components. Test the system's resilience by simulating various failure scenarios."
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "title": "Create Comprehensive Documentation and Examples",
+      "description": "Develop detailed documentation and example usage patterns.",
+      "status": "pending",
+      "dependencies": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "priority": "low",
+      "details": "Create comprehensive documentation including installation instructions, command reference, and example usage patterns. Document all command-line options. Create examples for different user personas (ML Engineer, DevOps Engineer, Edge Developer). Include troubleshooting guides and performance optimization tips. Prepare README and contribution guidelines for the open-source project.",
+      "testStrategy": "Review documentation for accuracy and completeness. Test examples to ensure they work as described. Get feedback from potential users representing different personas.",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Create Core Documentation Structure and Installation Guide",
+          "description": "Develop the foundational documentation structure and detailed installation instructions",
+          "status": "pending",
+          "dependencies": [],
+          "details": "Establish the documentation framework with proper organization. Create detailed installation guides covering all supported platforms and deployment scenarios. Include prerequisite requirements, step-by-step installation procedures, verification steps, and common installation issues with solutions. Document the project structure and architecture to help users understand the codebase. Create a README with project overview, quick start guide, and links to more detailed documentation sections."
+        },
+        {
+          "id": 2,
+          "title": "Develop Command Reference and User Persona Examples",
+          "description": "Create comprehensive command-line reference documentation and usage examples for different user personas",
+          "status": "pending",
+          "dependencies": [
+            1
+          ],
+          "details": "Document all command-line options with syntax, parameters, return values, and usage notes. Organize commands by category/functionality. Create specific usage examples tailored to different user personas: ML Engineer examples showing model optimization workflows, DevOps Engineer examples demonstrating integration into CI/CD pipelines, and Edge Developer examples highlighting deployment to resource-constrained environments. Include sample code, expected outputs, and explanatory notes for each example. Cross-reference examples with the command reference."
+        },
+        {
+          "id": 3,
+          "title": "Create Troubleshooting Guides, Performance Tips, and Contribution Guidelines",
+          "description": "Develop advanced documentation covering troubleshooting, optimization, and project contribution",
+          "status": "pending",
+          "dependencies": [
+            1,
+            2
+          ],
+          "details": "Create a comprehensive troubleshooting section with common issues, error messages, and resolution steps. Develop performance optimization tips with best practices, benchmarks, and configuration recommendations for different scenarios. Prepare contribution guidelines including code style conventions, pull request process, issue reporting templates, and development environment setup. Add documentation on the project roadmap and governance. Finalize by reviewing all documentation for consistency, accuracy, and completeness, ensuring proper cross-linking between sections."
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "projectName": "Tursi AI Model Deployment Framework",
+    "totalTasks": 10,
+    "sourceFile": "scripts/PRD.txt",
+    "generatedAt": "2023-11-09"
+  }
 }

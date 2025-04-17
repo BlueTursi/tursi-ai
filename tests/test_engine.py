@@ -42,17 +42,17 @@ def test_predict_endpoint(mock_pipeline):
     """Test the predict endpoint."""
     app = create_app(ALLOWED_MODELS[0])
     client = app.test_client()
-    
+
     # Test without data
     response = client.post('/predict')
     assert response.status_code == 400
     assert b'Request must be JSON' in response.data
-    
+
     # Test with invalid data
     response = client.post('/predict', json={})
     assert response.status_code == 400
     assert b'Missing \'text\' field' in response.data
-    
+
     # Test with valid data
     response = client.post('/predict', json={'text': 'Hello, world!'})
     assert response.status_code == 200
@@ -65,14 +65,14 @@ def test_input_validation(mock_pipeline):
     """Test input validation."""
     app = create_app(ALLOWED_MODELS[0])
     client = app.test_client()
-    
+
     # Test with too long input
     long_text = 'x' * 1000
     response = client.post('/predict', json={'text': long_text})
     assert response.status_code == 400
     assert b'Invalid input' in response.data
-    
+
     # Test with non-string input
     response = client.post('/predict', json={'text': 123})
     assert response.status_code == 400
-    assert b'Invalid input' in response.data 
+    assert b'Invalid input' in response.data

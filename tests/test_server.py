@@ -28,18 +28,18 @@ def server():
     # Set quantization settings
     os.environ["QUANTIZATION_MODE"] = "dynamic"
     os.environ["QUANTIZATION_BITS"] = "8"
-    
+
     # Start server in a separate process
     server_process = Process(target=run_server)
     server_process.start()
-    
+
     # Wait for server to start
     server_url = "http://127.0.0.1:5000"
     if not wait_for_server(server_url):
         pytest.fail(f"Server failed to start within timeout")
-    
+
     yield
-    
+
     # Cleanup
     server_process.terminate()
     server_process.join()
@@ -47,7 +47,7 @@ def server():
 def test_server_prediction(server):
     """Test that server responds correctly with quantized model."""
     url = "http://127.0.0.1:5000/predict"
-    
+
     try:
         # Test positive text
         positive_data = {"text": "This is amazing! I love it!"}
@@ -58,7 +58,7 @@ def test_server_prediction(server):
         assert "score" in result
         assert result["label"] in ["POSITIVE", "NEGATIVE"]
         assert 0 <= result["score"] <= 1
-        
+
         # Test negative text
         negative_data = {"text": "This is terrible! I hate it!"}
         response = requests.post(url, json=negative_data)
@@ -67,4 +67,4 @@ def test_server_prediction(server):
         assert result["label"] in ["POSITIVE", "NEGATIVE"]
         assert 0 <= result["score"] <= 1
     except requests.exceptions.RequestException as e:
-        pytest.fail(f"Failed to connect to server: {str(e)}") 
+        pytest.fail(f"Failed to connect to server: {str(e)}")

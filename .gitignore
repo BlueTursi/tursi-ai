@@ -19,49 +19,64 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+MANIFEST
 
 # Virtual Environment
 venv/
+env/
 ENV/
 .env
 .venv
+.env.*
+!.env.example
 
 # IDE
 .idea/
 .vscode/
 *.swp
 *.swo
+*~
+.cursor
 
 # Testing
 .coverage
 htmlcov/
 .pytest_cache/
 .tox/
+.nox/
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
 
-# Distribution
-dist/
-build/
-*.tar.gz
-*.whl
-
-# Sensitive files
-.pypirc
-.env
-
-# System files
-.DS_Store
-
-# Logs and temporary files
-*.log
-*.tmp
-
-# Avoid tracking large model files (if downloaded locally)
-*.bin
-*.pth
-
-# Local development tools
-bin/
-
-# Node.js
+# Node (for task-master)
 node_modules/
 package-lock.json
+
+# Build and Distribution
+*.log
+*.pot
+*.pyc
+.cache
+.DS_Store
+
+# Project specific
+.tursi/
+logs/
+models/
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

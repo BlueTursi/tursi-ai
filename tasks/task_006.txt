@@ -1,0 +1,30 @@
+# Task ID: 6
+# Title: Add Resource Monitoring and Statistics
+# Status: pending
+# Dependencies: 4, 5
+# Priority: medium
+# Description: Implement the 'tursi stats' command and underlying monitoring functionality.
+# Details:
+Create resource monitoring in the daemon to track CPU, memory, and GPU usage of deployed models. Implement the 'tursi stats' command in the CLI to display this information. Add real-time monitoring capabilities and historical data collection in SQLite. Create visualizations for the command-line output.
+
+# Test Strategy:
+Test monitoring accuracy by comparing with system tools like top or nvidia-smi. Verify stats command displays information correctly and handles different terminal sizes.
+
+# Subtasks:
+## 1. Implement Core Resource Monitoring in Daemon [pending]
+### Dependencies: None
+### Description: Create the foundational monitoring system in the daemon to track CPU, memory, and GPU usage of deployed models.
+### Details:
+Develop a monitoring module in the daemon that periodically collects resource usage metrics. Use psutil for CPU and memory monitoring, and appropriate GPU libraries (like pynvml for NVIDIA GPUs) to track GPU utilization. Implement a data collection scheduler that samples metrics at regular intervals (e.g., every 5 seconds). Store the collected data in memory with a time-based rolling window for immediate access. Create a simple API endpoint in the daemon that returns the current resource usage data when queried.
+
+## 2. Implement Data Persistence and Historical Tracking [pending]
+### Dependencies: 6.1
+### Description: Create a SQLite database schema and persistence layer to store historical resource usage data for long-term analysis.
+### Details:
+Design and implement a SQLite database schema to store time-series resource metrics. Include tables for system-wide metrics and per-model metrics with appropriate timestamps and identifiers. Create a data persistence service that periodically writes the in-memory metrics to the database. Implement data retention policies to prevent unlimited database growth (e.g., aggregate older data into hourly/daily summaries). Add query functions to retrieve historical data with filtering capabilities by time range and model ID.
+
+## 3. Implement CLI Stats Command with Visualizations [pending]
+### Dependencies: 6.1, 6.2
+### Description: Create the 'tursi stats' command in the CLI with options for displaying current and historical resource usage with visualizations.
+### Details:
+Implement the 'tursi stats' command with various subcommands and options: 'tursi stats current' for real-time monitoring, 'tursi stats history' for historical data, and model-specific filtering with '--model <model_id>'. Use libraries like rich or termgraph to create visually appealing terminal-based charts and tables. Implement real-time updating display for the 'current' option with refresh intervals. For historical data, create visualizations like bar charts, line graphs for time series, and summary statistics. Include options for exporting data to CSV or JSON formats. Add documentation and help text for all command options.

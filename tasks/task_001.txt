@@ -1,0 +1,30 @@
+# Task ID: 1
+# Title: Setup Project Structure
+# Status: done
+# Dependencies: None
+# Priority: high
+# Description: Create the initial project structure including the main directories and basic configuration files.
+# Details:
+Create the directory structure as specified in the PRD: tursi/ with subdirectories for cli/, daemon/, api/, and utils/. Initialize a Git repository, create a requirements.txt file with Python 3.11+ dependencies including Flask, Transformers, and PyTorch. Set up basic configuration files including setup.py for packaging.
+
+# Test Strategy:
+Verify all directories exist and can be imported as modules. Ensure the project can be installed in development mode with pip install -e .
+
+# Subtasks:
+## 1. Create directory structure and initialize Git repository [done]
+### Dependencies: None
+### Description: Set up the basic project directory structure and initialize version control
+### Details:
+Create the main tursi/ directory and its subdirectories (cli/, daemon/, api/, and utils/). Add empty __init__.py files in each directory to make them proper Python packages. Initialize a Git repository in the root directory with 'git init'. Create a basic .gitignore file that includes common Python patterns (like __pycache__/, *.pyc, etc.), virtual environments, and IDE-specific files.
+
+## 2. Create dependency and requirements files [done]
+### Dependencies: 1.1
+### Description: Set up requirements.txt with all project dependencies and version constraints
+### Details:
+Create a requirements.txt file in the project root listing all dependencies with version specifications. Include Flask (for API), Transformers and PyTorch (as specified), plus any utility libraries needed. Consider separating development dependencies (like pytest, black, flake8) from runtime dependencies. Ensure Python 3.11+ compatibility is noted in the file header.
+
+## 3. Set up packaging and configuration files [done]
+### Dependencies: 1.1, 1.2
+### Description: Create setup.py and basic configuration files for the project
+### Details:
+Create a setup.py file in the project root with package metadata, entry points for CLI tools, and dependency information synced with requirements.txt. Add a README.md with basic project description and setup instructions. Create a config/ directory with template configuration files for different environments (development, testing, production). Include a basic logging configuration file. Add placeholder main.py files in the cli/, daemon/, and api/ directories to establish entry points.

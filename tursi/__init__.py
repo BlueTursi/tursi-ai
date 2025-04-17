@@ -1,8 +1,8 @@
 """
-tursi - A simple framework to deploy AI models locally.
+Tursi - Deploy AI models with unmatched simplicity
 """
 
-__version__ = "0.3.3"
+__version__ = "0.3.0-alpha.1"
 
 from .engine import TursiEngine
 

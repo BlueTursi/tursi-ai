@@ -1,0 +1,19 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-toml
+      - id: check-added-large-files
+
+  - repo: local
+    hooks:
+      - id: verify-changelog
+        name: Verify CHANGELOG.md updates
+        entry: python scripts/verify_changelog.py
+        language: python
+        additional_dependencies: ['tomli']
+        files: ^(CHANGELOG\.md|pyproject\.toml)$
+        pass_filenames: false

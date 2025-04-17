@@ -1,0 +1,30 @@
+# Task ID: 2
+# Title: Implement Core Daemon Process (tursid)
+# Status: done
+# Dependencies: 1
+# Priority: high
+# Description: Create the daemon process (tursid) that will manage model deployments and resources.
+# Details:
+Implement the daemon process in Python that runs as a background service. Include functionality for starting/stopping, handling signals, and maintaining state. Create a SQLite database schema for storing model deployment information. Implement basic process management for starting and stopping model inference processes.
+
+# Test Strategy:
+Write unit tests to verify the daemon can start, stop, and maintain state. Test process management functions with mock model processes.
+
+# Subtasks:
+## 1. Implement daemon process framework with signal handling [done]
+### Dependencies: None
+### Description: Create the basic Python daemon process structure that can run in the background, respond to system signals, and maintain state
+### Details:
+Implement a Python class that handles daemonization using standard libraries like 'daemon' or built-in methods. Include proper handling for SIGTERM, SIGINT, and SIGHUP signals. Implement logging capabilities. Create configuration handling for daemon settings. Ensure the daemon can properly fork, detach from terminal, and run in the background. Include proper PID file management and implement graceful startup/shutdown procedures.
+
+## 2. Design and implement SQLite database schema for model deployment [done]
+### Dependencies: 2.1
+### Description: Create a SQLite database schema and interface for storing and retrieving model deployment information
+### Details:
+Design a database schema with tables for: 1) model metadata (name, version, path, etc.), 2) deployment configurations, 3) runtime statistics. Implement SQLAlchemy ORM models or a similar abstraction layer for database interactions. Create database migration scripts for version control. Implement CRUD operations for model deployments. Add methods to query deployment status and history. Include transaction support for maintaining data integrity. Design the schema to be extensible for future features.
+
+## 3. Implement model inference process management [done]
+### Dependencies: 2.1, 2.2
+### Description: Create functionality to start, monitor, and stop model inference processes
+### Details:
+Implement process management using libraries like 'subprocess' or 'multiprocessing'. Create methods to spawn child processes for model inference. Implement health checking and monitoring of running inference processes. Add resource management to control CPU/memory usage. Create an API for other components to request process operations. Implement process isolation for security. Add error handling and automatic recovery for crashed processes. Ensure proper cleanup of resources when processes terminate. Implement status reporting that updates the database schema created in subtask 2.
