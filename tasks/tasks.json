@@ -186,7 +186,7 @@
           "id": 1,
           "title": "Create ModelManager class structure",
           "description": "Implement the basic ModelManager class that will be responsible for model lifecycle management",
-          "status": "pending",
+          "status": "done",
           "dependencies": [],
           "details": "Create a ModelManager class with the following components: 1) Constructor that initializes necessary data structures for tracking loaded models and running inference servers, 2) Methods for model registration and validation, 3) Configuration handling for model parameters, 4) Error handling and logging infrastructure, 5) Interface methods that will be called by the daemon. Include documentation for each method and proper type hints. This class should follow a singleton pattern to ensure only one instance manages all models."
         },
@@ -194,7 +194,7 @@
           "id": 2,
           "title": "Implement model loading functionality",
           "description": "Add methods to load models from Hugging Face using the Transformers library",
-          "status": "pending",
+          "status": "done",
           "dependencies": [
             1
           ],

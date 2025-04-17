@@ -11,13 +11,13 @@ Implement the model deployment logic in the daemon. Use the Transformers library
 Test with small models like distilbert-base-uncased. Verify models can be loaded, run, and stopped correctly. Test memory usage and cleanup to ensure no leaks.
 
 # Subtasks:
-## 1. Create ModelManager class structure [pending]
+## 1. Create ModelManager class structure [done]
 ### Dependencies: None
 ### Description: Implement the basic ModelManager class that will be responsible for model lifecycle management
 ### Details:
 Create a ModelManager class with the following components: 1) Constructor that initializes necessary data structures for tracking loaded models and running inference servers, 2) Methods for model registration and validation, 3) Configuration handling for model parameters, 4) Error handling and logging infrastructure, 5) Interface methods that will be called by the daemon. Include documentation for each method and proper type hints. This class should follow a singleton pattern to ensure only one instance manages all models.
 
-## 2. Implement model loading functionality [pending]
+## 2. Implement model loading functionality [done]
 ### Dependencies: 5.1
 ### Description: Add methods to load models from Hugging Face using the Transformers library
 ### Details:
