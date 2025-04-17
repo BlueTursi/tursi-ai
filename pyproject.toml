@@ -34,6 +34,9 @@ black = "^24.0.0"
 build = "^1.0.3"
 twine = "^4.0.2"
 mypy = "^1.9.0"
+types-requests = "^2.31.0"
+types-flask = "^1.1.0"
+types-psutil = "^5.9.0"
 
 [tool.poetry.scripts]
 tursi = "tursi.cli:main"
@@ -63,3 +66,8 @@ warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
 disallow_incomplete_defs = true
+plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+module = ["transformers.*", "optimum.*", "torch.*"]
+ignore_missing_imports = true
