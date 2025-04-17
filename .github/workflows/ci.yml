@@ -16,6 +16,11 @@ on:
       - "poetry.lock"
       - ".pre-commit-config.yaml"
 
+# Minimal required permissions for the CI workflow
+permissions:
+  contents: read
+  pull-requests: read
+
 jobs:
   test-and-lint:
     runs-on: ubuntu-latest
