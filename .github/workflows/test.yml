@@ -2,14 +2,14 @@ name: Test
 
 on:
   push:
-    branches: [ main, 'release/*' ]
+    branches: [ "main", "release/*" ]
     paths:
       - 'tursi/**'
       - 'tests/**'
       - 'pyproject.toml'
       - 'poetry.lock'
   pull_request:
-    branches: [ main ]
+    branches: [ "main" ]
     paths:
       - 'tursi/**'
       - 'tests/**'
@@ -21,51 +21,18 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: write
-      security-events: write
 
     steps:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
+    - name: Set up Poetry
+      uses: ./.github/workflows
       with:
         python-version: '3.11'
-        cache: 'pip'
-
-    - name: Install Poetry
-      uses: snok/install-poetry@v1
-      with:
-        version: 1.7.1
-        virtualenvs-create: true
-        virtualenvs-in-project: true
-
-    - name: Cache virtual environment
-      uses: actions/cache@v3
-      with:
-        path: .venv
-        key: ${{ runner.os }}-python-${{ hashFiles('**/poetry.lock') }}
-
-    - name: Install dependencies
-      if: steps.cache.outputs.cache-hit != 'true'
-      run: poetry install --no-interaction --no-root
-
-    - name: Install project
-      run: poetry install --no-interaction
+        poetry-version: '1.7.1'
+        install-root: true
 
     - name: Run tests
-      run: poetry run pytest tests/ -v --cov=tursi --cov-report=xml
-
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
-      with:
-        file: ./coverage.xml
-        fail_ci_if_error: true
-
-    - name: Build package
-      run: poetry build
-
-    - name: Test installed package
-      run: poetry run python -c "import tursi; print(tursi.__version__)"
+      run: poetry run pytest tests/ -v

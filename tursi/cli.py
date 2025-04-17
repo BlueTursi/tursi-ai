@@ -1,4 +1,5 @@
 """Command-line interface for Tursi AI model deployment."""
+
 import os
 import sys
 import signal
@@ -18,10 +19,12 @@ from .engine import TursiEngine
 # Create console for rich output
 console = Console()
 
+
 def print_help(command: Optional[str] = None):
     """Print help message."""
     if command == "up":
-        console.print("""
+        console.print(
+            """
 [bold]Usage:[/bold]
   tursi up [OPTIONS] MODEL_NAME
 
@@ -39,9 +42,11 @@ def print_help(command: Optional[str] = None):
 
 [bold]Example:[/bold]
   $ tursi up distilbert-base-uncased --port 8000 --quantization dynamic
-""")
+"""
+        )
     else:
-        console.print("""
+        console.print(
+            """
 [bold]Tursi AI[/bold] - Deploy AI models with unmatched simplicity
 
 [bold]Usage:[/bold]
@@ -57,8 +62,10 @@ def print_help(command: Optional[str] = None):
 [bold]Options:[/bold]
   -h, --help     Show this message and exit
   -v, --version  Show version and exit
-""")
+"""
+        )
     raise typer.Exit()
+
 
 # Create Typer app instance
 app = typer.Typer(
@@ -67,10 +74,12 @@ app = typer.Typer(
     add_help_option=False,
 )
 
+
 # Define valid quantization modes
 class QuantizationMode(str, Enum):
     DYNAMIC = "dynamic"
     STATIC = "static"
+
 
 def version_callback(value: bool):
     """Print version and exit."""
@@ -78,11 +87,13 @@ def version_callback(value: bool):
         console.print(f"Tursi AI version: {__version__}")
         raise typer.Exit()
 
+
 def validate_bits(value: int) -> int:
     """Validate quantization bits."""
     if value not in (4, 8):
         raise typer.BadParameter("Quantization bits must be either 4 or 8")
     return value
+
 
 @app.callback()
 def callback(
@@ -105,6 +116,7 @@ def callback(
 ):
     """Deploy AI models with unmatched simplicity."""
     pass
+
 
 @app.command()
 def up(
@@ -211,16 +223,22 @@ def up(
         console.print(f"\n[red]Error:[/red] {str(e)}")
         raise typer.Exit(1)
 
+
 def find_tursi_processes() -> List[psutil.Process]:
     """Find all running Tursi model server processes."""
     tursi_processes = []
-    for proc in psutil.process_iter(['pid', 'name', 'cmdline']):
+    for proc in psutil.process_iter(["pid", "name", "cmdline"]):
         try:
-            if proc.info['cmdline'] and 'tursi' in ' '.join(proc.info['cmdline']) and 'up' in proc.info['cmdline']:
+            if (
+                proc.info["cmdline"]
+                and "tursi" in " ".join(proc.info["cmdline"])
+                and "up" in proc.info["cmdline"]
+            ):
                 tursi_processes.append(proc)
         except (psutil.NoSuchProcess, psutil.AccessDenied):
             pass
     return tursi_processes
+
 
 @app.command()
 def down():
@@ -244,7 +262,9 @@ def down():
                     # Try graceful shutdown first
                     proc.terminate()
                     try:
-                        proc.wait(timeout=5)  # Wait up to 5 seconds for graceful shutdown
+                        proc.wait(
+                            timeout=5
+                        )  # Wait up to 5 seconds for graceful shutdown
                     except psutil.TimeoutExpired:
                         # If graceful shutdown fails, force kill
                         proc.kill()
@@ -258,8 +278,11 @@ def down():
 
     except Exception as e:
         console.print(f"\n[red]Error stopping model servers:[/red] {str(e)}")
-        console.print("You can manually stop the server by pressing Ctrl+C in the terminal where it's running")
+        console.print(
+            "You can manually stop the server by pressing Ctrl+C in the terminal where it's running"
+        )
         raise typer.Exit(1)
+
 
 @app.command()
 def ps():
@@ -273,24 +296,39 @@ def ps():
 
     console.print(table)
     console.print("[yellow]⚠️ Process monitoring will be available in v0.4.0[/yellow]")
-    console.print("For now, use your system's process manager to view running Tursi instances")
-    console.print("\nTo track progress, visit: https://github.com/BlueTursi/tursi-ai/issues")
+    console.print(
+        "For now, use your system's process manager to view running Tursi instances"
+    )
+    console.print(
+        "\nTo track progress, visit: https://github.com/BlueTursi/tursi-ai/issues"
+    )
+
 
 @app.command()
 def logs():
     """View server logs."""
     console.print("[yellow]⚠️ Log viewing will be available in v0.4.0[/yellow]")
-    console.print("For now, logs are printed to the console where the server is running")
-    console.print("\nTo track progress, visit: https://github.com/BlueTursi/tursi-ai/issues")
+    console.print(
+        "For now, logs are printed to the console where the server is running"
+    )
+    console.print(
+        "\nTo track progress, visit: https://github.com/BlueTursi/tursi-ai/issues"
+    )
     raise typer.Exit(1)
+
 
 @app.command()
 def stats():
     """Show resource usage statistics."""
     console.print("[yellow]⚠️ Resource monitoring will be available in v0.4.0[/yellow]")
-    console.print("For now, use your system's resource monitor to track memory and CPU usage")
-    console.print("\nTo track progress, visit: https://github.com/BlueTursi/tursi-ai/issues")
+    console.print(
+        "For now, use your system's resource monitor to track memory and CPU usage"
+    )
+    console.print(
+        "\nTo track progress, visit: https://github.com/BlueTursi/tursi-ai/issues"
+    )
     raise typer.Exit(1)
+
 
 def main():
     """Deploy AI models with unmatched simplicity."""
