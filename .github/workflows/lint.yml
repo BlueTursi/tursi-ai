@@ -2,15 +2,15 @@ name: Lint
 
 on:
   push:
-    branches: [ main, 'release/*' ]
+    branches: [ "main", "release/*" ]
     paths:
-      - '**.py'
-      - 'pyproject.toml'
+      - "**.py"
+      - "pyproject.toml"
   pull_request:
-    branches: [ main ]
+    branches: [ "main", "release/*" ]
     paths:
-      - '**.py'
-      - 'pyproject.toml'
+      - "**.py"
+      - "pyproject.toml"
 
 jobs:
   lint:
@@ -18,12 +18,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Poetry
-        uses: ./.github/workflows/poetry-setup
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-          poetry-version: '1.7.1'
-          install-root: true
+          python-version: "3.11"
+
+      - name: Setup Poetry
+        uses: ./.github/workflows/action.yml
+        with:
+          python-version: "3.11"
+          poetry-version: "1.7.1"
+          install-root: false
 
       - name: Run black
         run: poetry run black --check tursi tests

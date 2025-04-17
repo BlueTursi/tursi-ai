@@ -47,7 +47,7 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Poetry
-        uses: ./.github/workflows/poetry-setup
+        uses: ./.github/workflows/action.yml
         with:
           python-version: '3.11'
           poetry-version: '1.7.1'
