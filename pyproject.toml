@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "tursi"
-version = "0.3.0-alpha.3"
+version = "0.3.0-alpha.1"
 description = "A simple framework to deploy AI models locally with one command, no containers needed"
 authors = ["Kresna Sucandra <kresnasucandra@gmail.com>"]
 license = "MIT"
@@ -33,13 +33,10 @@ flake8 = "^7.0.0"
 black = "^24.0.0"
 build = "^1.0.3"
 twine = "^4.0.2"
-mypy = "^1.9.0"
-types-requests = "^2.31.0"
-types-flask = "^1.1.0"
-types-psutil = "^5.9.0"
 
 [tool.poetry.scripts]
 tursi = "tursi.cli:main"
+tursi-engine = "tursi.engine:main"
 tursi-test = "tursi.test:main"
 tursid = "tursi.daemon:main"
 
@@ -54,20 +51,3 @@ ini_file = "tests/pytest.ini"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
-
-[tool.black]
-line-length = 88
-target-version = ['py311']
-include = '\.pyi?$'
-
-[tool.mypy]
-python_version = "3.11"
-warn_return_any = true
-warn_unused_configs = true
-disallow_untyped_defs = true
-disallow_incomplete_defs = true
-plugins = ["pydantic.mypy"]
-
-[[tool.mypy.overrides]]
-module = ["transformers.*", "optimum.*", "torch.*"]
-ignore_missing_imports = true

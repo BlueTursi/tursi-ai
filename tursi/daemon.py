@@ -1,7 +1,6 @@
 """
 Tursi Daemon (tursid) - Background process for managing AI model deployments.
 """
-
 import os
 import sys
 import signal
@@ -18,7 +17,6 @@ from .db import TursiDB
 from .engine import TursiEngine
 from .api import TursiAPI
 
-
 class ModelProcess:
     """Wrapper for a model deployment process."""
 
@@ -33,7 +31,9 @@ class ModelProcess:
     def start(self):
         """Start the model process."""
         self.process = mp.Process(
-            target=self._run_model, args=(self._stop_event,), daemon=True
+            target=self._run_model,
+            args=(self._stop_event,),
+            daemon=True
         )
         self.process.start()
         return self.process.pid
@@ -54,12 +54,12 @@ class ModelProcess:
         try:
             engine = TursiEngine()
             app = engine.create_app(
-                model_name=self.model_name, rate_limit=self.config.get("rate_limit")
+                model_name=self.model_name,
+                rate_limit=self.config.get("rate_limit")
             )
 
             # Run the Flask app with the stop event
             from werkzeug.serving import make_server
-
             server = make_server(self.host, self.port, app)
 
             # Run server in a separate thread so we can check the stop event
@@ -78,20 +78,14 @@ class ModelProcess:
             logging.error(f"Error in model process: {e}")
             sys.exit(1)
 
-
 class TursiDaemon:
     """
     Daemon process for managing Tursi AI model deployments.
     Handles process management, signal handling, and state persistence.
     """
 
-    def __init__(
-        self,
-        pid_file: str = "/tmp/tursid.pid",
-        db_path: Optional[str] = None,
-        api_host: str = "localhost",
-        api_port: int = 5000,
-    ):
+    def __init__(self, pid_file: str = "/tmp/tursid.pid", db_path: Optional[str] = None,
+                 api_host: str = "localhost", api_port: int = 5000):
         self.pid_file = pid_file
         self.is_running = False
         self.logger = self._setup_logging()
@@ -110,9 +104,7 @@ class TursiDaemon:
         atexit.register(self.cleanup)
 
         # Initialize state
-        self.model_processes: Dict[int, ModelProcess] = (
-            {}
-        )  # deployment_id -> ModelProcess
+        self.model_processes: Dict[int, ModelProcess] = {}  # deployment_id -> ModelProcess
 
     def _setup_logging(self) -> logging.Logger:
         """Configure daemon logging."""
@@ -133,7 +125,7 @@ class TursiDaemon:
 
         # Formatting
         formatter = logging.Formatter(
-            "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+            '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
         )
         fh.setFormatter(formatter)
         ch.setFormatter(formatter)
@@ -197,7 +189,7 @@ class TursiDaemon:
                 model_name=deployment["model_name"],
                 host=deployment["host"],
                 port=deployment["port"],
-                config=config,
+                config=config
             )
 
             pid = process.start()
@@ -206,7 +198,9 @@ class TursiDaemon:
             # Update database
             self.db.update_deployment_status(deployment_id, "running")
             self.db.add_log(
-                deployment_id, "INFO", f"Started model process with PID {pid}"
+                deployment_id,
+                "INFO",
+                f"Started model process with PID {pid}"
             )
 
             self.logger.info(f"Started deployment {deployment_id} with PID {pid}")
@@ -215,7 +209,9 @@ class TursiDaemon:
             self.logger.error(f"Failed to start deployment {deployment['id']}: {e}")
             self.db.update_deployment_status(deployment["id"], "failed")
             self.db.add_log(
-                deployment["id"], "ERROR", f"Failed to start deployment: {str(e)}"
+                deployment["id"],
+                "ERROR",
+                f"Failed to start deployment: {str(e)}"
             )
 
     def _stop_deployment(self, deployment_id: int) -> None:
@@ -228,13 +224,19 @@ class TursiDaemon:
 
                 # Update database
                 self.db.update_deployment_status(deployment_id, "stopped")
-                self.db.add_log(deployment_id, "INFO", "Stopped model process")
+                self.db.add_log(
+                    deployment_id,
+                    "INFO",
+                    "Stopped model process"
+                )
 
                 self.logger.info(f"Stopped deployment {deployment_id}")
         except Exception as e:
             self.logger.error(f"Error stopping deployment {deployment_id}: {e}")
             self.db.add_log(
-                deployment_id, "ERROR", f"Error stopping deployment: {str(e)}"
+                deployment_id,
+                "ERROR",
+                f"Error stopping deployment: {str(e)}"
             )
 
     def _update_metrics(self) -> None:
@@ -253,15 +255,15 @@ class TursiDaemon:
             except (psutil.NoSuchProcess, psutil.AccessDenied):
                 continue
             except Exception as e:
-                self.logger.error(
-                    f"Error updating metrics for deployment {deployment_id}: {e}"
-                )
+                self.logger.error(f"Error updating metrics for deployment {deployment_id}: {e}")
 
     def _start_api_server(self):
         """Start the API server in a separate thread."""
         self.api_server = TursiAPI(self.db)
         self.api_thread = threading.Thread(
-            target=self.api_server.run, args=(self.api_host, self.api_port), daemon=True
+            target=self.api_server.run,
+            args=(self.api_host, self.api_port),
+            daemon=True
         )
         self.api_thread.start()
         self.logger.info(f"API server started on {self.api_host}:{self.api_port}")
@@ -308,7 +310,7 @@ class TursiDaemon:
             sys.exit(1)
 
         # Decouple from parent environment
-        os.chdir("/")
+        os.chdir('/')
         os.umask(0)
         os.setsid()
 
@@ -325,9 +327,9 @@ class TursiDaemon:
         sys.stdout.flush()
         sys.stderr.flush()
 
-        with open(os.devnull, "r") as f:
+        with open(os.devnull, 'r') as f:
             os.dup2(f.fileno(), sys.stdin.fileno())
-        with open(os.devnull, "a+") as f:
+        with open(os.devnull, 'a+') as f:
             os.dup2(f.fileno(), sys.stdout.fileno())
             os.dup2(f.fileno(), sys.stderr.fileno())
 
@@ -341,7 +343,7 @@ class TursiDaemon:
             return
 
         try:
-            with open(self.pid_file, "r") as f:
+            with open(self.pid_file, 'r') as f:
                 pid = int(f.read().strip())
 
             # Try to terminate the process
@@ -416,12 +418,12 @@ class TursiDaemon:
                 # Check process health
                 for deployment_id, process in list(self.model_processes.items()):
                     if not process.process or not process.process.is_alive():
-                        self.logger.error(
-                            f"Process for deployment {deployment_id} died unexpectedly"
-                        )
+                        self.logger.error(f"Process for deployment {deployment_id} died unexpectedly")
                         self.db.update_deployment_status(deployment_id, "failed")
                         self.db.add_log(
-                            deployment_id, "ERROR", "Process died unexpectedly"
+                            deployment_id,
+                            "ERROR",
+                            "Process died unexpectedly"
                         )
                         del self.model_processes[deployment_id]
 
@@ -431,31 +433,28 @@ class TursiDaemon:
             self.logger.error(f"Error in daemon main loop: {e}")
             self.stop()
 
-
 def main():
     """Entry point for the daemon process."""
     import argparse
 
     parser = argparse.ArgumentParser(description="Tursi Daemon (tursid)")
-    parser.add_argument(
-        "action", choices=["start", "stop", "restart"], help="Action to perform"
-    )
-    parser.add_argument(
-        "--pid-file", default="/tmp/tursid.pid", help="Path to PID file"
-    )
-    parser.add_argument("--db-path", help="Path to SQLite database file")
+    parser.add_argument('action', choices=['start', 'stop', 'restart'],
+                       help='Action to perform')
+    parser.add_argument('--pid-file', default='/tmp/tursid.pid',
+                       help='Path to PID file')
+    parser.add_argument('--db-path',
+                       help='Path to SQLite database file')
 
     args = parser.parse_args()
 
     daemon = TursiDaemon(pid_file=args.pid_file, db_path=args.db_path)
 
-    if args.action == "start":
+    if args.action == 'start':
         daemon.start()
-    elif args.action == "stop":
+    elif args.action == 'stop':
         daemon.stop()
-    elif args.action == "restart":
+    elif args.action == 'restart':
         daemon.restart()
 
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

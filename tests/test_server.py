@@ -4,15 +4,12 @@ import pytest
 import requests
 import time
 from multiprocessing import Process
-from tursi.engine import TursiEngine
-
+from tursi.engine import create_app
 
 def run_server():
     """Helper function to run the server in a separate process."""
-    engine = TursiEngine()
-    app = engine.create_app("distilbert-base-uncased-finetuned-sst-2-english")
+    app = create_app("distilbert-base-uncased-finetuned-sst-2-english")
     app.run(host="127.0.0.1", port=5000)
-
 
 def wait_for_server(url, timeout=30, interval=1):
     """Wait for server to become available."""
@@ -24,7 +21,6 @@ def wait_for_server(url, timeout=30, interval=1):
         except requests.exceptions.ConnectionError:
             time.sleep(interval)
     return False
-
 
 @pytest.fixture(scope="module")
 def server():
@@ -47,7 +43,6 @@ def server():
     # Cleanup
     server_process.terminate()
     server_process.join()
-
 
 def test_server_prediction(server):
     """Test that server responds correctly with quantized model."""

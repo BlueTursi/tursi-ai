@@ -1,18 +1,23 @@
 # Release Notes
 
 ## What's Changed
-<!-- Release notes generated from semantic-release will be inserted here -->
+
+<!-- Release notes will be automatically generated here -->
 
 ## Installation
+
 ```bash
-pip install tursi
+pip install tursi=={version}
 ```
 
 ## Documentation
-For full documentation, visit our [documentation site](https://tursi.readthedocs.io/).
+
+For full documentation, visit our [GitHub repository](https://github.com/BlueTursi/tursi-ai).
 
 ## Breaking Changes
-Please review the CHANGELOG.md for any breaking changes before upgrading.
+
+Please check the [CHANGELOG.md](CHANGELOG.md) for any breaking changes before upgrading.
 
 ## Support
-If you encounter any issues, please file them on our [GitHub Issues](https://github.com/tursi-ai/tursi/issues) page.
+
+If you encounter any issues, please [open an issue](https://github.com/BlueTursi/tursi-ai/issues/new) on GitHub.

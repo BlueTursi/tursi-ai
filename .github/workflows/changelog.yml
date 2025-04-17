@@ -1,29 +1,22 @@
-name: Lint
+name: Update Changelog
+
 on:
   push:
-    branches: [ main, 'release/*' ]
-    paths:
-      - '**.py'
-      - 'pyproject.toml'
-      - '.flake8'
-  pull_request:
-    branches: [ main ]
-    paths:
-      - '**.py'
-      - 'pyproject.toml'
-      - '.flake8'
+    branches: ["main"]
 
 jobs:
-  lint:
+  update-changelog:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for all branches and tags
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v4
         with:
           python-version: "3.11"
-          cache: 'pip'
 
       - name: Install Poetry
         uses: snok/install-poetry@v1
@@ -45,5 +38,7 @@ jobs:
       - name: Install project
         run: poetry install --no-interaction
 
-      - name: Run flake8
-        run: poetry run flake8 tursi tests
+      - name: Generate changelog
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: poetry run semantic-release changelog

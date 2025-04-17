@@ -1,52 +1,54 @@
 """Tests for the Tursi database module."""
-
 import os
 import pytest
 import sqlite3
 from datetime import datetime, timedelta, UTC
 from tursi.db import TursiDB
 
-
 @pytest.fixture
 def db_path(tmp_path):
     """Provide a temporary database path."""
     return str(tmp_path / "test_tursi.db")
-
 
 @pytest.fixture
 def db(db_path):
     """Provide a database instance."""
     return TursiDB(db_path)
 
-
 @pytest.fixture
 def sample_deployment(db):
     """Create a sample deployment and return its ID."""
-    config = {"model": "test-model", "quantization": "dynamic", "bits": 8}
+    config = {
+        "model": "test-model",
+        "quantization": "dynamic",
+        "bits": 8
+    }
     return db.add_deployment(
         model_name="test-model",
         process_id=12345,
         host="localhost",
         port=5000,
-        config=config,
+        config=config
     )
-
 
 def test_init_db(db_path):
     """Test database initialization."""
     db = TursiDB(db_path)
     assert os.path.exists(db_path)
 
-
 def test_add_deployment(db):
     """Test adding a new deployment."""
-    config = {"model": "test-model", "quantization": "dynamic", "bits": 8}
+    config = {
+        "model": "test-model",
+        "quantization": "dynamic",
+        "bits": 8
+    }
     deployment_id = db.add_deployment(
         model_name="test-model",
         process_id=12345,
         host="localhost",
         port=5000,
-        config=config,
+        config=config
     )
 
     assert deployment_id > 0
@@ -55,13 +57,11 @@ def test_add_deployment(db):
     assert deployment["model_name"] == "test-model"
     assert deployment["status"] == "running"
 
-
 def test_update_deployment_status(db, sample_deployment):
     """Test updating deployment status."""
     db.update_deployment_status(sample_deployment, "stopped")
     deployment = db.get_deployment(sample_deployment)
     assert deployment["status"] == "stopped"
-
 
 def test_get_active_deployments(db, sample_deployment):
     """Test getting active deployments."""
@@ -74,7 +74,6 @@ def test_get_active_deployments(db, sample_deployment):
     deployments = db.get_active_deployments()
     assert len(deployments) == 0
 
-
 def test_add_and_get_logs(db, sample_deployment):
     """Test adding and retrieving logs."""
     db.add_log(sample_deployment, "INFO", "Test message")
@@ -85,7 +84,6 @@ def test_add_and_get_logs(db, sample_deployment):
     assert logs[0]["level"] == "ERROR"  # Most recent first
     assert logs[1]["level"] == "INFO"
 
-
 def test_add_and_get_metrics(db, sample_deployment):
     """Test adding and retrieving metrics."""
     db.add_metrics(sample_deployment, cpu_percent=50.0, memory_mb=1024.0)
@@ -95,7 +93,6 @@ def test_add_and_get_metrics(db, sample_deployment):
     assert len(metrics) == 2
     assert metrics[0]["cpu_percent"] == 60.0  # Most recent first
     assert metrics[1]["memory_mb"] == 1024.0
-
 
 def test_cleanup_old_metrics(db, sample_deployment):
     """Test cleaning up old metrics."""
@@ -108,7 +105,7 @@ def test_cleanup_old_metrics(db, sample_deployment):
             (deployment_id, cpu_percent, memory_mb, created_at)
             VALUES (?, ?, ?, ?)
             """,
-            (sample_deployment, 50.0, 1024.0, old_time),
+            (sample_deployment, 50.0, 1024.0, old_time)
         )
 
     # Add recent metrics
@@ -122,12 +119,10 @@ def test_cleanup_old_metrics(db, sample_deployment):
     assert len(metrics) == 1
     assert metrics[0]["cpu_percent"] == 60.0
 
-
 def test_get_nonexistent_deployment(db):
     """Test getting a deployment that doesn't exist."""
     deployment = db.get_deployment(999)
     assert deployment is None
-
 
 def test_log_limit(db, sample_deployment):
     """Test log retrieval limit."""
@@ -143,7 +138,6 @@ def test_log_limit(db, sample_deployment):
     logs = db.get_logs(sample_deployment, limit=50)
     assert len(logs) == 50
 
-
 def test_metrics_limit(db, sample_deployment):
     """Test metrics retrieval limit."""
     # Add more metrics than the default limit
@@ -157,7 +151,6 @@ def test_metrics_limit(db, sample_deployment):
     # Get metrics with custom limit
     metrics = db.get_metrics(sample_deployment, limit=30)
     assert len(metrics) == 30
-
 
 def test_initial_schema_creation(db_path):
     """Test that the initial schema is created correctly."""
@@ -176,16 +169,15 @@ def test_initial_schema_creation(db_path):
         tables = [row[0] for row in cursor.fetchall()]
 
         assert len(tables) == 4
-        assert "schema_version" in tables
-        assert "model_deployments" in tables
-        assert "model_logs" in tables
-        assert "resource_metrics" in tables
+        assert 'schema_version' in tables
+        assert 'model_deployments' in tables
+        assert 'model_logs' in tables
+        assert 'resource_metrics' in tables
 
         # Verify initial schema version
         cursor = conn.execute("SELECT version FROM schema_version")
         version = cursor.fetchone()[0]
         assert version == 1
-
 
 def test_migration_tracking(db_path):
     """Test that migrations are properly tracked."""
@@ -202,17 +194,14 @@ def test_migration_tracking(db_path):
     # Verify migration was applied
     with sqlite3.connect(db_path) as conn:
         # Check schema version was updated
-        cursor = conn.execute(
-            "SELECT version FROM schema_version ORDER BY version DESC"
-        )
+        cursor = conn.execute("SELECT version FROM schema_version ORDER BY version DESC")
         version = cursor.fetchone()[0]
         assert version == 2
 
         # Verify new column exists
         cursor = conn.execute("PRAGMA table_info(model_deployments)")
         columns = [row[1] for row in cursor.fetchall()]
-        assert "test_column" in columns
-
+        assert 'test_column' in columns
 
 def test_migration_idempotency(db_path):
     """Test that migrations are not reapplied."""
@@ -233,20 +222,17 @@ def test_migration_idempotency(db_path):
         count = cursor.fetchone()[0]
         assert count == 1
 
-
 def test_sequential_migrations(db_path):
     """Test that migrations are applied in correct order."""
     # Create database
     db = TursiDB(db_path)
 
     # Add multiple migrations
-    db.MIGRATIONS.update(
-        {
-            2: "ALTER TABLE model_deployments ADD COLUMN test_column1 TEXT;",
-            3: "ALTER TABLE model_deployments ADD COLUMN test_column2 TEXT;",
-            4: "ALTER TABLE model_deployments ADD COLUMN test_column3 TEXT;",
-        }
-    )
+    db.MIGRATIONS.update({
+        2: "ALTER TABLE model_deployments ADD COLUMN test_column1 TEXT;",
+        3: "ALTER TABLE model_deployments ADD COLUMN test_column2 TEXT;",
+        4: "ALTER TABLE model_deployments ADD COLUMN test_column3 TEXT;"
+    })
     db.CURRENT_VERSION = 4
 
     # Run migrations
@@ -264,9 +250,8 @@ def test_sequential_migrations(db_path):
 
         # Check columns exist and are in correct order
         col_indices = {col: idx for idx, col in enumerate(columns)}
-        assert col_indices["test_column1"] < col_indices["test_column2"]
-        assert col_indices["test_column2"] < col_indices["test_column3"]
-
+        assert col_indices['test_column1'] < col_indices['test_column2']
+        assert col_indices['test_column2'] < col_indices['test_column3']
 
 def test_failed_migration_rollback(db_path):
     """Test that failed migrations are rolled back."""
@@ -287,7 +272,6 @@ def test_failed_migration_rollback(db_path):
         version = cursor.fetchone()[0]
         assert version == 1
 
-
 def test_get_current_version(db_path):
     """Test getting current schema version."""
     # Create database
@@ -303,7 +287,6 @@ def test_get_current_version(db_path):
 
     # Verify updated version
     assert db._get_current_version() == 2
-
 
 def test_empty_migrations(db_path):
     """Test behavior when no migrations are needed."""

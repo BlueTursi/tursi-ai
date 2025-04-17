@@ -1,12 +1,10 @@
 """API server for Tursi daemon communication."""
-
 from flask import Flask, request, jsonify
 from typing import Optional, Dict
 import logging
 from .db import TursiDB
 
 logger = logging.getLogger(__name__)
-
 
 class TursiAPI:
     """API server for communicating with the Tursi daemon."""
@@ -24,27 +22,19 @@ class TursiAPI:
     def _setup_routes(self):
         """Configure API routes."""
         # Model deployment endpoints
-        self.app.route("/api/v1/models", methods=["POST"])(self.deploy_model)
-        self.app.route("/api/v1/models/<int:deployment_id>", methods=["DELETE"])(
-            self.stop_model
-        )
-        self.app.route("/api/v1/models", methods=["GET"])(self.list_models)
-        self.app.route("/api/v1/models/<int:deployment_id>", methods=["GET"])(
-            self.get_model_status
-        )
+        self.app.route('/api/v1/models', methods=['POST'])(self.deploy_model)
+        self.app.route('/api/v1/models/<int:deployment_id>', methods=['DELETE'])(self.stop_model)
+        self.app.route('/api/v1/models', methods=['GET'])(self.list_models)
+        self.app.route('/api/v1/models/<int:deployment_id>', methods=['GET'])(self.get_model_status)
 
         # Logging endpoints
-        self.app.route("/api/v1/models/<int:deployment_id>/logs", methods=["GET"])(
-            self.get_logs
-        )
+        self.app.route('/api/v1/models/<int:deployment_id>/logs', methods=['GET'])(self.get_logs)
 
         # Metrics endpoints
-        self.app.route("/api/v1/models/<int:deployment_id>/metrics", methods=["GET"])(
-            self.get_metrics
-        )
+        self.app.route('/api/v1/models/<int:deployment_id>/metrics', methods=['GET'])(self.get_metrics)
 
         # Health check endpoint
-        self.app.route("/api/v1/health", methods=["GET"])(self.health_check)
+        self.app.route('/api/v1/health', methods=['GET'])(self.health_check)
 
     def deploy_model(self):
         """Deploy a new model instance.
@@ -69,14 +59,9 @@ class TursiAPI:
             required_fields = ["model_name", "host", "port", "config"]
             missing_fields = [f for f in required_fields if f not in data]
             if missing_fields:
-                return (
-                    jsonify(
-                        {
-                            "error": f"Missing required fields: {', '.join(missing_fields)}"
-                        }
-                    ),
-                    400,
-                )
+                return jsonify({
+                    "error": f"Missing required fields: {', '.join(missing_fields)}"
+                }), 400
 
             # Add deployment to database
             deployment_id = self.db.add_deployment(
@@ -84,10 +69,13 @@ class TursiAPI:
                 process_id=None,  # Will be set by daemon when process starts
                 host=data["host"],
                 port=data["port"],
-                config=data["config"],
+                config=data["config"]
             )
 
-            return jsonify({"deployment_id": deployment_id, "status": "pending"}), 202
+            return jsonify({
+                "deployment_id": deployment_id,
+                "status": "pending"
+            }), 202
 
         except Exception as e:
             logger.error(f"Error deploying model: {e}")
@@ -103,7 +91,10 @@ class TursiAPI:
             # Update status to stopping - daemon will handle actual process termination
             self.db.update_deployment_status(deployment_id, "stopping")
 
-            return jsonify({"deployment_id": deployment_id, "status": "stopping"}), 202
+            return jsonify({
+                "deployment_id": deployment_id,
+                "status": "stopping"
+            }), 202
 
         except Exception as e:
             logger.error(f"Error stopping model: {e}")
@@ -113,7 +104,9 @@ class TursiAPI:
         """List all active model deployments."""
         try:
             deployments = self.db.get_active_deployments()
-            return jsonify({"deployments": deployments}), 200
+            return jsonify({
+                "deployments": deployments
+            }), 200
 
         except Exception as e:
             logger.error(f"Error listing models: {e}")
@@ -139,10 +132,13 @@ class TursiAPI:
             if not deployment:
                 return jsonify({"error": "Deployment not found"}), 404
 
-            limit = request.args.get("limit", default=100, type=int)
+            limit = request.args.get('limit', default=100, type=int)
             logs = self.db.get_logs(deployment_id, limit=limit)
 
-            return jsonify({"deployment_id": deployment_id, "logs": logs}), 200
+            return jsonify({
+                "deployment_id": deployment_id,
+                "logs": logs
+            }), 200
 
         except Exception as e:
             logger.error(f"Error getting logs: {e}")
@@ -155,10 +151,13 @@ class TursiAPI:
             if not deployment:
                 return jsonify({"error": "Deployment not found"}), 404
 
-            limit = request.args.get("limit", default=60, type=int)
+            limit = request.args.get('limit', default=60, type=int)
             metrics = self.db.get_metrics(deployment_id, limit=limit)
 
-            return jsonify({"deployment_id": deployment_id, "metrics": metrics}), 200
+            return jsonify({
+                "deployment_id": deployment_id,
+                "metrics": metrics
+            }), 200
 
         except Exception as e:
             logger.error(f"Error getting metrics: {e}")
@@ -166,15 +165,10 @@ class TursiAPI:
 
     def health_check(self):
         """API health check endpoint."""
-        return (
-            jsonify(
-                {
-                    "status": "healthy",
-                    "version": "0.1.0",  # TODO: Get from package version
-                }
-            ),
-            200,
-        )
+        return jsonify({
+            "status": "healthy",
+            "version": "0.1.0"  # TODO: Get from package version
+        }), 200
 
     def run(self, host: str = "localhost", port: int = 5000):
         """Run the API server.

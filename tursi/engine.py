@@ -11,7 +11,6 @@ from optimum.onnxruntime import ORTModelForSequenceClassification
 from transformers import AutoTokenizer, AutoConfig
 import onnxruntime as ort
 
-
 class TursiEngine:
     """Main engine class for Tursi AI model deployment."""
 
@@ -35,9 +34,7 @@ class TursiEngine:
         self.RATE_LIMIT_STORAGE_URI = os.getenv("RATE_LIMIT_STORAGE_URI", "memory://")
 
         # Quantization settings
-        self.QUANTIZATION_MODE = os.getenv(
-            "QUANTIZATION_MODE", "dynamic"
-        )  # dynamic or static
+        self.QUANTIZATION_MODE = os.getenv("QUANTIZATION_MODE", "dynamic")  # dynamic or static
         self.QUANTIZATION_BITS = int(os.getenv("QUANTIZATION_BITS", "8"))  # 8 or 4 bits
 
         # Model storage
@@ -69,10 +66,8 @@ class TursiEngine:
             config = AutoConfig.from_pretrained(model_name)
             # Check if model architecture is supported
             supported_architectures = ["DistilBert", "Bert", "RoBERTa", "GPT2"]
-            return any(
-                arch.lower() in config.architectures[0].lower()
-                for arch in supported_architectures
-            )
+            return any(arch.lower() in config.architectures[0].lower()
+                      for arch in supported_architectures)
         except Exception as e:
             self.logger.error(f"Error checking model compatibility: {str(e)}")
             return False
@@ -84,14 +79,13 @@ class TursiEngine:
 
             # Load tokenizer
             tokenizer = AutoTokenizer.from_pretrained(
-                model_name, cache_dir=self.MODEL_CACHE_DIR
+                model_name,
+                cache_dir=self.MODEL_CACHE_DIR
             )
 
             # Configure ONNX Runtime session options
             session_options = ort.SessionOptions()
-            session_options.graph_optimization_level = (
-                ort.GraphOptimizationLevel.ORT_ENABLE_ALL
-            )
+            session_options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
             session_options.intra_op_num_threads = 1
 
             # Load model with quantization
@@ -99,7 +93,7 @@ class TursiEngine:
                 model_name,
                 export=True,
                 session_options=session_options,
-                cache_dir=self.MODEL_CACHE_DIR,
+                cache_dir=self.MODEL_CACHE_DIR
             )
 
             self.logger.info(
@@ -149,7 +143,7 @@ class TursiEngine:
         app = Flask(__name__)
 
         # Store rate limit in app config
-        app.config["RATE_LIMIT"] = rate_limit
+        app.config['RATE_LIMIT'] = rate_limit
 
         # Initialize rate limiter
         limiter = Limiter(
@@ -157,7 +151,7 @@ class TursiEngine:
             key_func=get_remote_address,
             storage_uri=self.RATE_LIMIT_STORAGE_URI,
             default_limits=[rate_limit],
-            strategy="fixed-window",
+            strategy="fixed-window"
         )
 
         @app.route("/predict", methods=["POST"])
@@ -169,40 +163,31 @@ class TursiEngine:
 
                 data = request.get_json()
                 if not data or "text" not in data:
-                    return jsonify({"error": "Missing 'text' field in request"}), 400
+                    return jsonify({
+                        "error": "Missing 'text' field in request"
+                    }), 400
 
                 text = data.get("text", "")
 
                 # Validate input
                 if not self.validate_input(text):
-                    return (
-                        jsonify(
-                            {
-                                "error": (
-                                    "Invalid input. Text must be a string of maximum "
-                                    "length 512 characters."
-                                )
-                            }
-                        ),
-                        400,
-                    )
+                    return jsonify({
+                        "error": (
+                            "Invalid input. Text must be a string of maximum "
+                            "length 512 characters."
+                        )
+                    }), 400
 
                 # Tokenize input
-                inputs = tokenizer(
-                    text, return_tensors="pt", padding=True, truncation=True
-                )
+                inputs = tokenizer(text, return_tensors="pt", padding=True, truncation=True)
 
                 # Run inference
                 outputs = model(**inputs)
                 predictions = outputs.logits.softmax(dim=-1)
 
                 # Get prediction
-                label = (
-                    "POSITIVE" if predictions[0][1] > predictions[0][0] else "NEGATIVE"
-                )
-                score = float(
-                    predictions[0][1] if label == "POSITIVE" else predictions[0][0]
-                )
+                label = "POSITIVE" if predictions[0][1] > predictions[0][0] else "NEGATIVE"
+                score = float(predictions[0][1] if label == "POSITIVE" else predictions[0][0])
 
                 return jsonify({"label": label, "score": score})
             except Exception as e:
@@ -212,27 +197,22 @@ class TursiEngine:
         @app.route("/health", methods=["GET"])
         def health_check():
             """Health check endpoint."""
-            return jsonify(
-                {
-                    "status": "healthy",
-                    "model": model_name,
-                    "quantization": {
-                        "mode": self.QUANTIZATION_MODE,
-                        "bits": self.QUANTIZATION_BITS,
-                    },
+            return jsonify({
+                "status": "healthy",
+                "model": model_name,
+                "quantization": {
+                    "mode": self.QUANTIZATION_MODE,
+                    "bits": self.QUANTIZATION_BITS
                 }
-            )
+            })
 
         return app
-
 
 def main():
     """Main entry point for the CLI."""
     parser = argparse.ArgumentParser(description="Tursi AI Model Deployment")
     parser.add_argument("--model", type=str, required=True, help="Model name to deploy")
-    parser.add_argument(
-        "--rate-limit", type=str, help="Rate limit (e.g., '100 per minute')"
-    )
+    parser.add_argument("--rate-limit", type=str, help="Rate limit (e.g., '100 per minute')")
     args = parser.parse_args()
 
     try:
@@ -242,7 +222,6 @@ def main():
     except Exception as e:
         print(f"Error: {str(e)}", file=sys.stderr)
         sys.exit(1)
-
 
 if __name__ == "__main__":
     main()
