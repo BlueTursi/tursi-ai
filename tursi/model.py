@@ -120,7 +120,17 @@ class ModelServer:
 
     def health_check(self):
         """Health check endpoint."""
-        return jsonify({"status": "healthy", "model": self.model_name}), 200
+        # Add more checks here if needed (e.g., model responsiveness)
+        return (
+            jsonify(
+                {
+                    "status": "healthy",
+                    "model": self.model_name,
+                    "message": "Server is running and model is loaded",
+                }
+            ),
+            200,
+        )
 
 
 class ModelManager:
@@ -443,3 +453,26 @@ class ModelManager:
         self.servers.clear()
 
         logger.info("ModelManager cleanup complete")
+
+    def get_deployment_status(self) -> Dict[int, Dict[str, Any]]:
+        """Get the status of all current model deployments.
+
+        Returns:
+            Dictionary mapping port numbers to deployment details.
+        """
+        status = {}
+        for port, server_info in self.servers.items():
+            model_info = self.models.get(server_info["model_name"])
+            status[port] = {
+                "model_name": server_info["model_name"],
+                "host": server_info["server"].host,
+                "port": server_info["server"].port,
+                "thread_status": (
+                    "alive" if server_info["thread"].is_alive() else "stopped"
+                ),
+                "quantization": model_info.config.quantization if model_info else "N/A",
+                "bits": model_info.config.bits if model_info else "N/A",
+                "rate_limit": model_info.config.rate_limit if model_info else "N/A",
+                "device": model_info.config.device if model_info else "N/A",
+            }
+        return status

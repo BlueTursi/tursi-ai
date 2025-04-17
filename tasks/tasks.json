@@ -173,7 +173,7 @@
       "id": 5,
       "title": "Implement Model Deployment Logic",
       "description": "Create the core functionality to deploy and run AI models.",
-      "status": "in-progress",
+      "status": "done",
       "dependencies": [
         2,
         3
@@ -204,7 +204,7 @@
           "id": 3,
           "title": "Implement inference server management and lifecycle hooks",
           "description": "Add functionality to start, monitor, and shut down inference servers for loaded models",
-          "status": "pending",
+          "status": "done",
           "dependencies": [
             2
           ],
