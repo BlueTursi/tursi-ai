@@ -24,7 +24,7 @@ jobs:
           python-version: "3.11"
 
       - name: Setup Poetry
-        uses: ./.github/workflows/action.yml
+        uses: ./.github/workflows
         with:
           python-version: "3.11"
           poetry-version: "1.7.1"
