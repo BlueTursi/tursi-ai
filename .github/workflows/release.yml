@@ -4,16 +4,19 @@ on:
   push:
     branches: [ 'release/*' ]
   pull_request:
-    types: [labeled]
+    types: [labeled, synchronize, opened]
     branches: [ main ]
 
 permissions:
   contents: write
   packages: write
+  pull-requests: write
 
 jobs:
   version-and-release:
-    if: "!startsWith(github.ref, 'refs/tags/')"
+    if: |
+      !startsWith(github.ref, 'refs/tags/') &&
+      (github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'alpha') || contains(github.event.pull_request.labels.*.name, 'beta') || contains(github.event.pull_request.labels.*.name, 'major') || contains(github.event.pull_request.labels.*.name, 'minor'))
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -39,13 +42,16 @@ jobs:
 
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
             echo "Processing as pull request"
-            if [[ "${{ github.event.label.name }}" == "major" ]]; then
+            labels="${{ toJSON(github.event.pull_request.labels.*.name) }}"
+            echo "PR labels: $labels"
+
+            if echo "$labels" | jq -e 'contains(["major"])' > /dev/null; then
               echo "type=major" >> $GITHUB_OUTPUT
-            elif [[ "${{ github.event.label.name }}" == "minor" ]]; then
+            elif echo "$labels" | jq -e 'contains(["minor"])' > /dev/null; then
               echo "type=minor" >> $GITHUB_OUTPUT
-            elif [[ "${{ github.event.label.name }}" == "alpha" ]]; then
+            elif echo "$labels" | jq -e 'contains(["alpha"])' > /dev/null; then
               echo "type=alpha" >> $GITHUB_OUTPUT
-            elif [[ "${{ github.event.label.name }}" == "beta" ]]; then
+            elif echo "$labels" | jq -e 'contains(["beta"])' > /dev/null; then
               echo "type=beta" >> $GITHUB_OUTPUT
             else
               echo "type=patch" >> $GITHUB_OUTPUT
