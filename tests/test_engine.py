@@ -4,13 +4,19 @@ Tests for the tursi engine module.
 import pytest
 from unittest.mock import patch, MagicMock
 from flask import Flask
-from tursi.engine import create_app, ALLOWED_MODELS
+from tursi.engine import TursiEngine
+
+
+@pytest.fixture
+def engine():
+    """Create a TursiEngine instance for testing."""
+    return TursiEngine()
 
 
 @pytest.fixture
 def mock_pipeline():
     """Mock the transformers pipeline."""
-    with patch('tursi.engine.pipeline') as mock:
+    with patch('tursi.engine.ORTModelForSequenceClassification') as mock:
         # Create a mock model that returns a fixed result
         mock_model = MagicMock()
         mock_model.return_value = [{'label': 'POSITIVE', 'score': 0.9}]
@@ -18,29 +24,29 @@ def mock_pipeline():
         yield mock
 
 
-def test_create_app(mock_pipeline):
+def test_create_app(engine, mock_pipeline):
     """Test that create_app returns a Flask application."""
-    app = create_app(ALLOWED_MODELS[0])
+    app = engine.create_app(engine.ALLOWED_MODELS[0])
     assert isinstance(app, Flask)
     assert app.config['RATE_LIMIT'] == '100 per minute'  # default rate limit
 
 
-def test_create_app_with_custom_rate_limit(mock_pipeline):
+def test_create_app_with_custom_rate_limit(engine, mock_pipeline):
     """Test that create_app accepts custom rate limit."""
-    app = create_app(ALLOWED_MODELS[0], rate_limit='50 per minute')
+    app = engine.create_app(engine.ALLOWED_MODELS[0], rate_limit='50 per minute')
     assert isinstance(app, Flask)
     assert app.config['RATE_LIMIT'] == '50 per minute'
 
 
-def test_create_app_with_invalid_model():
+def test_create_app_with_invalid_model(engine):
     """Test that create_app raises error for invalid model."""
     with pytest.raises(ValueError, match=r"Model .* is not in the allowed list"):
-        create_app('invalid-model')
+        engine.create_app('invalid-model')
 
 
-def test_predict_endpoint(mock_pipeline):
+def test_predict_endpoint(engine, mock_pipeline):
     """Test the predict endpoint."""
-    app = create_app(ALLOWED_MODELS[0])
+    app = engine.create_app(engine.ALLOWED_MODELS[0])
     client = app.test_client()
 
     # Test without data
@@ -61,9 +67,9 @@ def test_predict_endpoint(mock_pipeline):
     assert data['score'] == 0.9
 
 
-def test_input_validation(mock_pipeline):
+def test_input_validation(engine, mock_pipeline):
     """Test input validation."""
-    app = create_app(ALLOWED_MODELS[0])
+    app = engine.create_app(engine.ALLOWED_MODELS[0])
     client = app.test_client()
 
     # Test with too long input

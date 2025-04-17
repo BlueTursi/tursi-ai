@@ -4,11 +4,12 @@ import pytest
 import requests
 import time
 from multiprocessing import Process
-from tursi.engine import create_app
+from tursi.engine import TursiEngine
 
 def run_server():
     """Helper function to run the server in a separate process."""
-    app = create_app("distilbert-base-uncased-finetuned-sst-2-english")
+    engine = TursiEngine()
+    app = engine.create_app("distilbert-base-uncased-finetuned-sst-2-english")
     app.run(host="127.0.0.1", port=5000)
 
 def wait_for_server(url, timeout=30, interval=1):

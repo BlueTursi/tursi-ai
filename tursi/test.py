@@ -5,7 +5,7 @@ import json
 
 def main():
     parser = argparse.ArgumentParser(
-        description="tursi-test: Test a deployed tursi-engine model"
+        description="tursi-test: Test a deployed tursi model"
     )
     parser.add_argument(
         "--prompt",
@@ -15,7 +15,7 @@ def main():
     parser.add_argument(
         "--url",
         default="http://localhost:5000/predict",
-        help="URL of the tursi-engine server"
+        help="URL of the tursi server"
     )
     args = parser.parse_args()
 

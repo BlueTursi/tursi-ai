@@ -36,7 +36,6 @@ twine = "^4.0.2"
 
 [tool.poetry.scripts]
 tursi = "tursi.cli:main"
-tursi-engine = "tursi.engine:main"
 tursi-test = "tursi.test:main"
 tursid = "tursi.daemon:main"
 
