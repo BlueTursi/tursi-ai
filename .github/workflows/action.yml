@@ -37,8 +37,11 @@ runs:
         path: .venv
         key: ${{ runner.os }}-python-${{ hashFiles('**/poetry.lock') }}
 
+    - name: Update lock file
+      shell: bash
+      run: poetry lock --no-update
+
     - name: Install dependencies
-      if: steps.cache.outputs.cache-hit != 'true'
       shell: bash
       run: poetry install --no-interaction --no-root
 
