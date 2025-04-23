@@ -28,7 +28,7 @@ psutil = "^5.9.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"
-pytest-cov = "^4.1.0"
+pytest-cov = ">=4.1,<7.0"
 flake8 = "^7.0.0"
 black = ">=24,<26"
 build = "^1.0.3"
