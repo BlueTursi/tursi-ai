@@ -49,6 +49,9 @@ jobs:
           path: .venv
           key: venv-${{ runner.os }}-py3.11-${{ hashFiles('poetry.lock') }}
 
+      - name: Check lock file consistency
+        run: poetry lock --check
+
       - name: Install dependencies
         run: poetry install
 
