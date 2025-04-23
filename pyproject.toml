@@ -19,7 +19,7 @@ torch = "^2.2.1"
 python-dotenv = "^1.0.0"
 flask-limiter = "^3.5.0"
 optimum = "^1.17.0"
-accelerate = "^0.27.0"
+accelerate = ">=0.27,<1.7"
 onnxruntime = "^1.17.0"
 onnx = "^1.15.0"
 typer = {extras = ["all"], version = "^0.9.0"}
