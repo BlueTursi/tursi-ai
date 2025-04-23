@@ -1,8 +1,8 @@
 # tursi-ai
 
 [![GitHub release](https://img.shields.io/github/v/release/BlueTursi/tursi-ai)](https://github.com/BlueTursi/tursi-ai/releases)
-[![Tests](https://github.com/BlueTursi/tursi-ai/actions/workflows/test.yml/badge.svg)](https://github.com/BlueTursi/tursi-ai/actions/workflows/test.yml)
-[![codecov](https://codecov.io/gh/BlueTursi/tursi-ai/branch/main/graph/badge.svg)](https://codecov.io/gh/BlueTursi/tursi-ai)
+[![CI](https://github.com/BlueTursi/tursi-ai/workflows/CI/badge.svg)](https://github.com/BlueTursi/tursi-ai/actions/workflows/ci.yml)
+[![Coverage](https://img.shields.io/badge/coverage-79%25-brightgreen.svg)](https://github.com/BlueTursi/tursi-ai)
 
 Deploy AI models with unmatched simplicity - zero container overhead. Features efficient model quantization for reduced memory usage and faster inference, perfect for resource-constrained environments like IoT and Edge devices.
 
