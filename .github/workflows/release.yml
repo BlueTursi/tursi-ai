@@ -40,9 +40,28 @@ jobs:
             exit 1
           fi
 
+  security:
+    name: Security scan
+    runs-on: ubuntu-latest
+    needs: pre-check
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/python@master
+        with:
+          args: --all-projects
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      - name: Upload Snyk results (optional)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: snyk-results
+          path: snyk*report*
+
   build-release:
     name: Build and publish release
-    needs: pre-check
+    needs: [pre-check, security]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -96,22 +115,3 @@ jobs:
           body_path: CHANGELOG.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  security:
-    name: Security scan
-    runs-on: ubuntu-latest
-    needs: build-release
-    steps:
-      - uses: actions/checkout@v4
-      - name: Run Snyk to check for vulnerabilities
-        uses: snyk/actions/python@master
-        with:
-          args: --all-projects
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-      - name: Upload Snyk results (optional)
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: snyk-results
-          path: snyk*report*
