@@ -2544,14 +2544,14 @@ files = [
 
 [[package]]
 name = "types-psutil"
-version = "5.9.5.20240516"
+version = "7.0.0.20250401"
 description = "Typing stubs for psutil"
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.9"
 groups = ["dev"]
 files = [
-    {file = "types-psutil-5.9.5.20240516.tar.gz", hash = "sha256:bb296f59fc56458891d0feb1994717e548a1bcf89936a2877df8792b822b4696"},
-    {file = "types_psutil-5.9.5.20240516-py3-none-any.whl", hash = "sha256:83146ded949a10167d9895e567b3b71e53ebc5e23fd8363eab62b3c76cce7b89"},
+    {file = "types_psutil-7.0.0.20250401-py3-none-any.whl", hash = "sha256:ed23f7140368104afe4e05a6085a5fa56fbe8c880a0f4dfe8d63e041106071ed"},
+    {file = "types_psutil-7.0.0.20250401.tar.gz", hash = "sha256:2a7d663c0888a079fc1643ebc109ad12e57a21c9552a9e2035da504191336dbf"},
 ]
 
 [[package]]
@@ -2741,4 +2741,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11,<3.13"
-content-hash = "b96de774a708bbf6564320f3ec8775842ee9489c00c2eb223a7e97a1115d4111"
+content-hash = "40196a45f90ff63544008a08c3313549db662c17829c2ed417a67494a9a9de07"
