@@ -2,4 +2,4 @@ transformers
 flask
 torch==2.7.0
 requests
-numpy<2
+numpy<3
