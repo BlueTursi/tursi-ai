@@ -911,19 +911,19 @@ type = ["pygobject-stubs", "pytest-mypy", "shtab", "types-pywin32"]
 
 [[package]]
 name = "limits"
-version = "5.0.0"
+version = "5.2.0"
 description = "Rate limiting utilities"
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "limits-5.0.0-py3-none-any.whl", hash = "sha256:9d8bad5a14a96e2a66a8f3bd8deaf9265f0bce9d6cc0606c72eb9f3ed377dffc"},
-    {file = "limits-5.0.0.tar.gz", hash = "sha256:a16f6c60b2cb7ae686e85f630a8e2428f49e06b0d335601ca7e0d756d58db503"},
+    {file = "limits-5.2.0-py3-none-any.whl", hash = "sha256:e4e2cf8ccca090d2276e1c60352658c1c498e1756927272abc6ce5bfdbcc02cc"},
+    {file = "limits-5.2.0.tar.gz", hash = "sha256:b6b659774f17befef2dd30a76dcd2bdecf3852e73b6627143d44ab4deda94b48"},
 ]
 
 [package.dependencies]
 deprecated = ">=1.2"
-packaging = ">=21,<25"
+packaging = ">=21,<26"
 typing_extensions = "*"
 
 [package.extras]
