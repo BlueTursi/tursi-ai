@@ -23,7 +23,7 @@ jobs:
     outputs:
       version: ${{ steps.extract_version.outputs.version }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Extract version from pyproject.toml
         id: extract_version
@@ -45,7 +45,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: pre-check
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Run Snyk to check for vulnerabilities
         uses: snyk/actions/python@master
         with:
@@ -64,7 +64,7 @@ jobs:
     needs: [pre-check, security]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
