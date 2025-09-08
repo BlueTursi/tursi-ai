@@ -22,7 +22,7 @@ optimum = "^1.17.0"
 accelerate = ">=1.6,<1.7"
 onnxruntime = "^1.17.0"
 onnx = "^1.15.0"
-typer = {extras = ["all"], version = ">=0.9,<0.16"}
+typer = {extras = ["all"], version = ">=0.9,<0.18"}
 rich = "^13.0.0"
 psutil = ">=5.9,<8.0"
 
