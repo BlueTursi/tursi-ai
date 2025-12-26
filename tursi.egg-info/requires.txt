@@ -3,3 +3,4 @@ flask
 torch==2.7.0
 requests
 numpy<3
+urllib3>=2.6.0 # not directly required, pinned by Snyk to avoid a vulnerability
