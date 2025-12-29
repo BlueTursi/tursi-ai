@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "task-master-ai": "^0.12.1",
+    "task-master-ai": "^0.13.2",
     "@anthropic-ai/sdk": "^0.40.1",
     "boxen": "^8.0.1",
     "chalk": "^4.1.2",
