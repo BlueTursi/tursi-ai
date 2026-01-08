@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "@anthropic-ai/sdk": "^0.41.0",
-    "task-master-ai": "^0.13.2",
+    "task-master-ai": "^0.20.0",
     "boxen": "^8.0.1",
     "chalk": "^4.1.2",
     "commander": "^11.1.0",
@@ -9,7 +9,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.21.2",
-    "fastmcp": "^1.27.0",
+    "fastmcp": "^3.0.1",
     "figlet": "^1.8.0",
     "fuse.js": "^7.0.0",
     "gradient-string": "^3.0.0",
