@@ -4,4 +4,4 @@ torch==2.7.0
 requests
 numpy<3
 werkzeug>=3.1.4 # not directly required, pinned by Snyk to avoid a vulnerability
-filelock>=3.20.3 # not directly required, pinned by Snyk to avoid a vulnerability
+zipp>=3.19.1 # not directly required, pinned by Snyk to avoid a vulnerability
