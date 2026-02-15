@@ -4,3 +4,4 @@ torch==2.7.0
 requests
 numpy<3
 werkzeug>=3.1.4 # not directly required, pinned by Snyk to avoid a vulnerability
+urllib3>=2.6.3 # not directly required, pinned by Snyk to avoid a vulnerability
