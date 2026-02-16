@@ -23,7 +23,7 @@ accelerate = ">=1.6,<1.7"
 onnxruntime = "^1.17.0"
 onnx = "^1.15.0"
 typer = {extras = ["all"], version = ">=0.9,<0.22"}
-rich = "^13.0.0"
+rich = ">=13,<15"
 psutil = ">=5.9,<8.0"
 
 [tool.poetry.group.dev.dependencies]
