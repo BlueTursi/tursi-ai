@@ -91,7 +91,7 @@ jobs:
           verbose: true
 
       - name: Upload artifacts to GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ github.event.inputs.version }}
           files: |
@@ -109,7 +109,7 @@ jobs:
           futureRelease: ${{ github.event.inputs.version }}
 
       - name: Upload changelog to release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ github.event.inputs.version }}
           body_path: CHANGELOG.md
